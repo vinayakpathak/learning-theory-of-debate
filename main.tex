@@ -1,0 +1,155 @@
+\documentclass[anon]{alt2027} % submission template (anonymized)
+%\documentclass[final]{alt2027} % camera-ready template (de-anonymized)
+
+% The following packages will be automatically loaded:
+% amsmath, amssymb, natbib, graphicx, url, xcolor, hyperref, algorithm2e
+% Keep alt2027.cls, jmlr.cls, and jmlrutils.sty in the same directory as
+% this file. Compile with latexmk -pdf alt2027-sample.tex or your usual
+% LaTeX workflow.
+
+\input{macros}
+
+\title[Learnability via Debate]{Towards a Theory of Learnability via Debate}
+\usepackage{times}
+% Use \Name{Author Name} to specify the name.
+% If the surname contains spaces, enclose the surname
+% in braces, e.g. \Name{John {Smith Jones}} similarly
+% if the name has a "von" part, e.g \Name{Jane {de Winter}}.
+% If the first letter in the forenames is a diacritic
+% enclose the diacritic in braces, e.g. \Name{{\'E}louise Smith}
+
+% Two authors with the same address
+% \altauthor{\Name{Author Name1} \Email{abc@sample.com}\and
+%  \Name{Author Name2} \Email{xyz@sample.com}\\
+%  \addr Address}
+
+% Three or more authors with the same address:
+% \altauthor{\Name{Author Name1} \Email{an1@sample.com}\\
+%  \Name{Author Name2} \Email{an2@sample.com}\\
+%  \Name{Author Name3} \Email{an3@sample.com}\\
+%  \addr Address}
+
+% Authors with different addresses:
+\altauthor{%
+ \Name{Author Name1} \Email{abc@sample.com}\\
+ \addr Address 1
+ \AND
+ \Name{Author Name2} \Email{xyz@sample.com}\\
+ \addr Address 2%
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}%
+  We initiate the formal study of learning via debate.%
+\end{abstract}
+
+\begin{keywords}%
+  Learning via debate, online learning, Littlestone tree
+\end{keywords}
+
+\section{Introduction}
+
+\section{Formal Setup}
+We let $\X$ denote a \emph{domain}, $\Y = \{0,1\}$ a binary \emph{label space}, and $\C = \{0,1\}$ a binary \emph{certificate space}~\vinayak{Are we committing to C being binary?}.  A \emph{hypothesis} is a function $h:\X\to\Y$, and we use $\H$ to denote a \emph{hypothesis class}.
+
+A \emph{debate of length }$n$ is a sequence $(\c_1, \c_2, \ldots, \c_{2n})$ of $2n$ certificates. We think of these certificates as being produced alternately by two debaters. That is, we think of the certificates $c_i$ of odd index as being produced by the first debater \emph{True}, and the certificates $c_i$ of even index by the second debater \emph{False}. To clarify the role of the arguments in the debate, we usually will use the notation $(\ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n)$ for a debate of length $n$
+
+
+The debate is moderated through a \emph{verifier} $v: \X\times \C^{2n} \to \Y$ which takes in a domain point and a debate of length $n$ and produces a label for $x$ given the arguments in the debate. The following definition specifies the relationship between hypotheses and verifiers.
+
+\begin{definition}
+Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \Y$ \emph{validates} hypothesis $h$ through debate of length $n$ if 
+\begin{align*}
+~\forall~ x\in \X ~\exists~ \ct^1 \in \C ~\forall~ \cf^1 \in \C   ~\exists~ \ct^2 \in \C ~\forall~ & \cf^2 \in \C \ldots ~\exists~ \ct^n \in \C ~\forall~ \cf^n ~:~ \\
+& v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = h(x)
+\end{align*}
+\vinayak{
+I think what we want is:
+\begin{align*}
+~\forall~ x\in \X ~\exists~ \ct^1 \in \C ~\forall~ \cf^1 \in \C   ~\exists~ \ct^2 \in \C ~\forall~ & \cf^2 \in \C \ldots ~\exists~ \ct^n \in \C ~\forall~ \cf^n ~:~ \\
+& v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = y \iff h(x) = y
+\end{align*}
+
+This ensures that the situation where there is a valid debate transcript for both labels does not happen.
+}
+In this case, we also say that $v$ is a verifier for hypothesis $h$. We call a verifier \emph{valid} if there exists a hypothesis $h$ that is validated by $v$.
+\end{definition}
+Note that a given valid verifier $v$ may validate multiple hypotheses $h$, and likewise, a given hypothesis $h$ may be validated by multiple verifiers $v$~\vinayak{Oh I see. I have been thinking of verifiers as uniquely defining a hypothesis. Given an $x$ and a $v$, I think only one unique label should meet the condition above, and that label will define a unique hypothesis. I think Tosca is saying the same thing below.}. We will call a set of valid verifiers a \emph{verifiers class}, and us notation $\V$ to denote a verifier class. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
+\tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
+
+\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$). Of course, debaters True and False don't know the identiy of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thus also to the implied hypothesis class $\H_V$.
+
+\paragraph{The debate protocol}
+
+\begin{itemize}
+\item For rounds $t = 1\ldots T$ repeat:
+\begin{enumerate}
+ \item The environment poses an $x_t\in\X$
+ \item Debater True hypothesizes label $\hy_t$
+ \item For $i = 1 \ldots n$ repeat:
+ \begin{itemize}
+  \item Debater True brings argument $\ct^i_t$ (in support of label $\hy_t$)
+  \item Debater False brings argument $\cf^i_t$ (aiming to falsify label $\hy_t$)
+ \end{itemize}
+ \item The verifier $v^*$ reveals $y_t = v(x, \ct^1_t, \cf^1_t, \ct^2_t, \cf^2_t, \ldots,  \ct^n_t, \cf^n_t)$\\
+       The environment records (but does not reveal) $y^*_t = h^*(x_t)$
+\end{enumerate}
+\item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
+\begin{align*}
+ \Mi(T) = \sum_{t = 1}^T [y_t \neq y^*_t]\quad\text{define regret in comparison to optimal debaters(?)}
+\end{align*}
+\item Debater True is evaluated through its \emph{loss} and its \emph{regret}
+\begin{align*}
+ \Lo_T(T) = \sum_{t = 1}^T [y_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for True}
+\end{align*}
+\ruth{In the realizable case all rounds are achievable for True, but probably not in the agnostic case?} \tosca{We got into a debate about how to formalize this in our meeting in Hamilton last week as well. In other settings we often just deducted $k$ (the number of exceptions), which may be an overestimation of non-achievable rounds. }
+\item Debater False is evaluated through \emph{loss} and its \emph{regret}
+\begin{align*}
+ \Lo_F(T) = \sum_{t = 1}^T [y_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \Lo_F(T) - \#\text{unachievable rounds for False}
+\end{align*}
+\end{itemize}
+\ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
+\vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., True has picked the ``correct'' certificate and so False cannot possibly win.}
+
+The number of rounds may be finite ($T\in\naturals$) or infinite ($T = \infty$).
+\ruth{$T$ not stands for both the number of rounds and the True debater.. we may want to change the debater names to ``Affirm'' and ``Oppose'' rather than True and False}\tosca{I agree with that suggestion}
+
+We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater True is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater False on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater False, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to concude the correct label $y^*_t$ in each round.
+
+We will study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regreat) for the debate evaluation. We will distinguish between the \emph{cooperative case} and the \emph{combative case}. In the cooperative case both debaters are acting cooperatively so as to minimize the debate evaluation measures. We can think of this as a scenario where debater False provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions having taking into accound releveant potential counter-arguments. In contrast, in the combative case, both debaters are acting in a way to minimize their own evaluation measures respectively. Thus in this case, even debater true may put up hypothesized labels $\hy_t$ that it knows it can argue for even through it is already aware the this does not correspond to the underlying truth $y^*_t$. We study whether the true underlying hypotheses can be recovered in both scenarios.
+
+\vinayak{I'm not sure that I like the names ``cooperative'' and ``combative''. The point of studying the cooperative version was to understand the best way to use access to this kind of verifiers. The ``debate'' thesis is that the best way to use such a verifier is to set up two debaters and let them argue against each other. But we don't think that should be the case. So the question is, if we don't restrict ourselves to set up these debaters and simply understand the best way to use these verifiers, what's the best that can be done? So ``cooperative'' is really just more general and ``combative'' is more restrictive. This should be reflected in the names somehow.}
+
+\section{The Cooperative Case}
+
+
+\section{The Combative Case}
+% Authors are strongly encouraged to include an anonymous AI Disclosure section
+% if generative AI was used substantively. Uncomment and replace the example:
+% \section*{AI Disclosure}
+% We used [tool] to [briefly explain how it was used].
+
+% Acknowledgments---Will not appear in anonymized version
+\acks{We thank our colleagues and funding agencies;
+  \texttt{\textbackslash documentclass[anon]\{alt2027\}}
+automatically hides this text.}
+
+% Replace yourbibfile with the name of your BibTeX database and uncomment:
+% \bibliography{yourbibfile}
+
+\appendix
+
+% \crefalias{section}{appendix} % uncomment if you are using cleveref
+
+\section{Deferred proofs}
+
+Here is the proof of the main lemma from the paper body.
+
+\begin{proofof}{Theorem 1}
+  Follows from the concavity of $\ln(\cdot)$ and Jensen's inequality.
+\end{proofof}
+
+\end{document}
