@@ -12,6 +12,8 @@
 \title[Learnability via Debate]{Towards a Theory of Learnability via Debate}
 \usepackage[T1]{fontenc}
 \usepackage{times}
+\usepackage{bbm}
+
 % Use \Name{Author Name} to specify the name.
 % If the surname contains spaces, enclose the surname
 % in braces, e.g. \Name{John {Smith Jones}} similarly
@@ -80,6 +82,8 @@ In this case, we also say that $v$ is a verifier for hypothesis $h$. We call a v
 Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}
 % ~\vinayak{Oh I see. I have been thinking of verifiers as uniquely defining a hypothesis. Given an $x$ and a $v$, I think only one unique label should meet the condition above, and that label will define a unique hypothesis. I think Tosca is saying the same thing below.}. 
 We will call a set of valid verifiers a \emph{verifiers class}, and use notation $\V$ to denote a verifier class. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
+For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier class} $\V$ if $\H = \H_\V$.
+
 % \tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
 
 \paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$). Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
@@ -96,21 +100,21 @@ We will call a set of valid verifiers a \emph{verifiers class}, and use notation
   \item Debater \dt brings argument $\ct^i_t$ (in support of label $\hy_t$)
   \item Debater \df brings argument $\cf^i_t$ (aiming to falsify label $\hy_t$)
  \end{itemize}
- \item The verifier $v^*$ reveals $y_t = v(x, \ct^1_t, \cf^1_t, \ct^2_t, \cf^2_t, \ldots,  \ct^n_t, \cf^n_t)$\\
-       The environment records (but does not reveal) $y^*_t = h^*(x_t)$
+ \item The verifier $v^*$ reveals $\vy_t = v(x, \ct^1_t, \cf^1_t, \ct^2_t, \cf^2_t, \ldots,  \ct^n_t, \cf^n_t)$\\
+       The environment records (but does not reveal) $\ty_t = h^*(x_t)$
 \end{enumerate}
 \item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
 \begin{align*}
- \Mi(T) = \sum_{t = 1}^T [y_t \neq y^*_t]\quad\text{define regret in comparison to optimal debaters(?)}
+ \Mi(T) = \sum_{t = 1}^T [\vy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
 \end{align*}
 \item Debater \dt is evaluated through its \emph{loss} and its \emph{regret}
 \begin{align*}
- \Lo_T(T) = \sum_{t = 1}^T [y_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
+ \Lo_T(T) = \sum_{t = 1}^T [\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
 \end{align*}
 \ruth{In the realizable case all rounds are achievable for \dt, but probably not in the agnostic case?} \tosca{We got into a debate about how to formalize this in our meeting in Hamilton last week as well. In other settings we often just deducted $k$ (the number of exceptions), which may be an overestimation of non-achievable rounds. }
 \item Debater \df is evaluated through \emph{loss} and its \emph{regret}
 \begin{align*}
- \Lo_F(T) = \sum_{t = 1}^T [y_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \Lo_F(T) - \#\text{unachievable rounds for \df}
+ \Lo_F(T) = \sum_{t = 1}^T [\vy_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \Lo_F(T) - \#\text{unachievable rounds for \df}
 \end{align*}
 \end{itemize}
 \ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
@@ -124,23 +128,72 @@ We will study for which verifier classes $\V$ the above protocol leads to a fini
 \vinayak{I'm not sure that I like the names ``cooperative'' and ``combative''. The point of studying the cooperative version was to understand the best way to use access to this kind of verifiers. The ``debate'' thesis is that the best way to use such a verifier is to set up two debaters and let them argue against each other. But we don't think that should be the case. So the question is, if we don't restrict ourselves to set up these debaters and simply understand the best way to use these verifiers, what's the best that can be done? So ``cooperative'' is really just more general and ``combative'' is more restrictive. This should be reflected in the names somehow.}
 
 \section{The Cooperative Case}
-In this section, we start by exploring the cooperative case of learning via debate. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents all potential runs of the debate protocol for a given starting instance $x_0$. 
+In this section, we start by exploring the cooperative case of learning via debate. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents potential runs of the debate protocol for debate length $n$.
 
-\begin{definition}
-Given a debate length $n$, we define a \emph{length-$n$-debate tree} to be the directed tree $\T$ with the following properties:
+\begin{definition}[Debate Tree]
+Given a debate length $n$, we define a \emph{length-$n$-debate tree} to be a directed tree $\T$ with the following properties:
 \begin{enumerate}
-    \item Every node $\alpha$ in $\T$ is a pair of a domain point and a label $\alpha=(x_\alpha, y_\alpha)$.
-    \item The root node is denoted by $\rho$. It's domain point is $x_\rho$ and it's label is $y_\rho = \sqcup$, where $\sqcup\notin\Y$. \item The root node $\rho$ is the only node in $\T$ with associated label $y_\rho \notin\Y$. For all nodes $\alpha\neq \rho$, we have $y_\alpha\in \Y$.
-    \item Edges $(\alpha, \beta)$ in $\T$ are directed away from the root node, and annotated with a label $\ell^\alpha_\beta = (\hy^\alpha_\beta, \bar{c}^\alpha_\beta)$, where $\bar{c} = (\ct^1_{\alpha\beta}, \cf^1_{\alpha\beta}, \ct^2_{\alpha\beta}, \cf^2_{\alpha\beta}, \ldots,  \ct^n_{\alpha\beta}, \cf^n_{\alpha\beta})$ is a debate of length $n$. 
+    \item Every node $\alpha$ in $\T$ is a pair of a domain point and a label $\alpha=(x_\alpha, \vy_\alpha)$.
+    \item The root node is denoted by $\rho$. Its domain point is denoted by $x_\rho$, and its label is $\vy_\rho = \sqcup$, where $\sqcup\notin\Y$. \item The root node $\rho$ is the only node in $\T$ with associated label $\vy_\rho \notin\Y$: for all nodes $\alpha\neq \rho$, we have $\vy_\alpha\in \Y$.
+    \item Edges $(\alpha, \beta)$ in $\T$ are directed away from the root node, and annotated with a label $\ell^\alpha_\beta = (\hy^\alpha_\beta, \sc^\alpha_\beta)$, where $\sc^\alpha_\beta = (\ct^1_{\alpha\beta}, \cf^1_{\alpha\beta}, \ct^2_{\alpha\beta}, \cf^2_{\alpha\beta}, \ldots,  \ct^n_{\alpha\beta}, \cf^n_{\alpha\beta})$ is a debate of length $n$.
     % We will denote edges by triples
     % \[
-    % (\alpha, \ell, \beta) = ((x_\alpha, y_\alpha), (\hy^\alpha_\beta, \bar{c}^\alpha_\beta),  (x_\beta, y_\beta)).
+    % (\alpha, \ell, \beta) = ((x_\alpha, y_\alpha), (\hy^\alpha_\beta, \sc^\alpha_\beta),  (x_\beta, y_\beta)).
     % \]
-    \item For each node $\alpha$ and each possible edge annotation $(\hy, \bar{c})$, there is exactly one child node $\beta$ to $\alpha$ with $\ell^\alpha_\beta = (\hy, \bar{c})$
+    \item For each node $\alpha$ and each possible edge annotation $(\hy, \sc)$, there is exactly one child node $\beta$ to $\alpha$ with $\ell^\alpha_\beta = (\hy, \sc)$
 \end{enumerate}
 We let $\Delta_n$ denote the set of all length-$n$-debate trees $\T$.
 \end{definition}
 
+A debate tree for debate length $n$ as defined above corresponds to running the debate protocol indefinitely. As usual in these types of trees, the nodes correspond to actions of the (potentially adversarial) environment. In our case, this includes the verifier's evaluations $\vy$. The edges in the tree record the debaters' actions. That is, an edge records the label $\hy$ that the \dt poses, as well as the debate $\sc$ of length $n$ that then ensues between the two debaters. A non-root node records the verifier's evaluation of the debate on the incoming edge for the domain point from the previous round, recorded in the node's parent, as well as the new domain instance that the environment poses for the next round.
+The root node only records the instance that the protocol is initiated with.
+
+To analyze learnability, we will define \emph{version spaces} of verifiers that agree with paths in the debate tree.
+Let $(\alpha,\beta)$ be an edge in the tree $\T$ and let $v\in\V$ be a verifier. We say \emph{$v$ is consistent with edge $(\alpha, \beta)$} if
+\[
+v(x_\alpha, \sc^\alpha_\beta) = v(x_\alpha, \ct^1_{\alpha\beta}, \cf^1_{\alpha\beta}, \ct^2_{\alpha\beta}, \cf^2_{\alpha\beta}, \ldots,  \ct^n_{\alpha\beta}, \cf^n_{\alpha\beta}) = \vy_\beta
+\]
+Let $p$ be a directed path (down the tree) in $\T$. We define the \emph{verifier version space of path $p$} to be the set
+\[
+ \V_p = \{ v\in\V ~\mid~ v \text{ is consistent with all edges in }p\}
+\]
+Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$.
+
+For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all (finite and infinite) paths in $\T$ that start at $\alpha$.
+
+For version spaces, we may use the shorthand notations $\V^\alpha_\beta = \V_{p^\alpha_\beta}$ and $\V_\beta = \V_{p_\beta}$. That is $\V_\beta$ is the verifier version space at a node $\beta$ in the tree: $\V_\beta$ contains exactly those verifiers that are consistent with the debate protocol as run from the beginning $\rho$ to node $\beta$ in the tree. Analogously, we use $\H^\alpha_\beta$ and $\H_\beta$ for the corresponding induced hypothesis version spaces.
+
+For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagreements between $h$ and the recorded labels on path $p$. That is
+\[
+ \mi(h, p) = \sum_{(\alpha, \beta)\in p}\indct[h(x_\alpha)\neq \vy_\beta]
+\]
+Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred with respect to candidate verifier $v$.
+
+For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all (finite and infinite) paths that are starting at $\alpha$.
+We define the \emph{depth} of subtree $\T^\alpha$ with respect to verifier class $\V$ as follows:
+\[
+\depth(\T^\alpha, \V) = \min_{p\in P^\alpha}~ \max_{h\in \H_\alpha \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )
+\]
+Note that the depth of a subtree rooted at $\alpha$ counts the number of (past and future) mistakes that the debate could incur with verifiers that are consistent with the path up to $\alpha$.
+The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that is $\depth(\T) = \depth(\T^\rho)$. Note that at the root node, there is no past, and thus only future mistakes are counted:
+\[
+\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{p\in P^\rho}~ \max_{h\in \H_\V \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )  = \min_{p\in P^\rho}~ \max_{h\in \H_{\V_p}}~    \mi(h, p)
+\]
+\ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
+With this we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
+\begin{definition}[Debate Littlestone Dimension]
+ Let $\V$ be a verifier class for domain $\X$, $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
+ \[
+  \dldim(\V, n) = \sup_{\T\in\Delta_n} \depth(\T,\V)
+ \]
+If the length $n$ is fixed (or clear from context) we will also use the shorthand notation $\dldim(\V) =   \dldim(\V, n)$.
+\end{definition}
+We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with finite mistake bound.
+
+\begin{theorem}
+Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if there is a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
+\end{theorem}
+\ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
 
 
 \section{The Combative Case}
