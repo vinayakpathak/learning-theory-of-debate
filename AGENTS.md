@@ -196,6 +196,8 @@ or terminology for the debate model.
 
 ## Definitions, notation, and mathematical exposition
 
+- Write Boolean constants in lowercase upright type in mathematics:
+  `\mathrm{true}` and `\mathrm{false}`.
 - Define abbreviations once at first use, then use the short form throughout,
   including appendices. Use consistent names for the same mathematical
   objects and participants across definitions, statements, and proofs.
