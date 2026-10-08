@@ -87,7 +87,7 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 
 % \tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
 
-\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$). Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
+\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, we assume that there are at most $k$ \emph{misspecified} rounds where the true label can be different from the one assigned by $h^*$.} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
 
 \paragraph{The debate protocol}
 
@@ -213,7 +213,7 @@ We will now consider the case in which instead of knowing a class perfectly, the
 Formally, we will consider the $k$-nonrealizable case, i.e., situations in which all but $k$ rounds are consistent with the behaviour of a verifier $v\in \V$.
 
 \begin{theorem}
-    For every $d$ and every $n$, there exists a class $\V_{d,n}$ with $\dldimim(\V_d)=d$ and such that every deterministic makes $\Omega(kd)$ mistakes in the $k$-agnostic case.
+    For every $d$ and every $n$, there exists a class $\V_{d,n}$ with $\dldim(\V_d)=d$ and such that every deterministic makes $\Omega(kd)$ mistakes in the $k$-agnostic case.
 \end{theorem}
 \begin{proof}
     Consider $\X= \C = \naturals$. 
