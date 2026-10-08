@@ -58,7 +58,7 @@
 
 \section{Formal Setup}
 % We let $\X$ denote a \emph{domain}, $\Y = \{0,1\}$ a binary \emph{label space}, and $\C = \{0,1\}$ a binary \emph{certificate space}.  
-We let $\X$ denote a \emph{domain}, $\Y $ a \emph{label space}, and $\C$ a \emph{certificate space}.  
+We let $\X$ denote a \emph{domain}, $\Y = \{0,1\}$ a binary \emph{label space}, and $\C$ a \emph{certificate space}.  
 A \emph{hypothesis} is a function $h:\X\to\Y$, and we use $\H$ to denote a \emph{hypothesis class}.
 A \emph{debate of length} $n$ is a sequence $(\c_1, \c_2, \ldots, \c_{2n})$ of $2n$ certificates $c_i\in\C$. We think of these certificates as being produced alternately by two debaters. That is, we think of the certificates $c_i$ of odd index as being produced by the first debater, which we will call the \dt, and the certificates $c_i$ of even index by the second debater, which we will refer to as the \df. To clarify the role of the arguments in the debate, we usually will use the notation $(\ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n)$ for a debate of length $n$
 
@@ -74,12 +74,13 @@ Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \
 ~\forall~ x\in \X ~\exists~ \ct^1 \in \C ~\forall~ \cf^1 \in \C &  ~\exists~ \ct^2 \in \C ~\forall~  \cf^2 \in \C \ldots ~\exists~ \ct^n \in \C ~\forall~ \cf^n \in \C ~:~ \\
 & v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = y \iff h(x) = y
 \end{align*}
+\vinayak{Note a slight difference with what I said in the intro. I realized that the intro definition is more faithful to the debate literature, but it's equivalent to this definition, so it doesn't change anything.}
 % \vinayak{
 % This ensures that the situation where there is a valid debate transcript for both labels does not happen.
 % }
 In this case, we also say that $v$ is a verifier for hypothesis $h$. We call a verifier \emph{valid} if there exists a hypothesis $h$ that is validated by $v$.
 \end{definition}
-Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}
+Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}\vinayak{Yes this is true, and I think this is kind of important, so we should keep it this way.}
 % ~\vinayak{Oh I see. I have been thinking of verifiers as uniquely defining a hypothesis. Given an $x$ and a $v$, I think only one unique label should meet the condition above, and that label will define a unique hypothesis. I think Tosca is saying the same thing below.}. 
 We will call a set of valid verifiers a \emph{verifiers class}, and use notation $\V$ to denote a verifier class. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
 For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier class} $\V$ if $\H = \H_\V$.
@@ -105,8 +106,8 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 \end{enumerate}
 \item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
 \begin{align*}
- \Mi(T) = \sum_{t = 1}^T [\vy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
-\end{align*}
+ \Mi(T) = \sum_{t = 1}^T [\hy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
+\end{align*}~\vinayak{We intended this to be $[\hat{y} \neq y^*]$}
 \item Debater \dt is evaluated through its \emph{loss} and its \emph{regret}
 \begin{align*}
  \Lo_T(T) = \sum_{t = 1}^T [\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
@@ -209,7 +210,15 @@ Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from le
 
 \subsection{Non-realizable case}
 We will now consider the case in which instead of knowing a class perfectly, there exists some noise feedback, or misspecification.
-Formally, we will consider the $k$-nonrealizable case, i.e., situations in which the rounds of 
+Formally, we will consider the $k$-nonrealizable case, i.e., situations in which all but $k$ rounds are consistent with the behaviour of a verifier $v\in \V$.
+
+\begin{theorem}
+    For every $d$ and every $n$, there exists a class $\V_{d,n}$ with $\dldimim(\V_d)=d$ and such that every deterministic makes $\Omega(kd)$ mistakes in the $k$-agnostic case.
+\end{theorem}
+\begin{proof}
+    Consider $\X= \C = \naturals$. 
+    
+\end{proof}
 
 \section{The Combative Case}
 % Authors are strongly encouraged to include an anonymous AI Disclosure section
