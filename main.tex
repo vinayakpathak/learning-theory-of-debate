@@ -159,7 +159,7 @@ Let $p$ be a directed path (down the tree) in $\T$. We define the \emph{verifier
 \]
 Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$.
 
-For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all (finite and infinite) paths in $\T$ that start at $\alpha$.
+For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all infinite paths in $\T$ that start at $\alpha$.
 
 For version spaces, we may use the shorthand notations $\V^\alpha_\beta = \V_{p^\alpha_\beta}$ and $\V_\beta = \V_{p_\beta}$. That is $\V_\beta$ is the verifier version space at a node $\beta$ in the tree: $\V_\beta$ contains exactly those verifiers that are consistent with the debate protocol as run from the beginning $\rho$ to node $\beta$ in the tree. Analogously, we use $\H^\alpha_\beta$ and $\H_\beta$ for the corresponding induced hypothesis version spaces.
 
@@ -169,17 +169,27 @@ For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagre
 \]
 Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred with respect to candidate verifier $v$.
 
-For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all (finite and infinite) paths that are starting at $\alpha$.
+For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all infinite paths that are starting at $\alpha$.
 We define the \emph{depth} of subtree $\T^\alpha$ with respect to verifier class $\V$ as follows:
+% \[
+% \depth(\T^\alpha, \V) = \min_{p\in P^\alpha}~ \max_{h\in \H_\alpha \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )
+% \]
+
 \[
-\depth(\T^\alpha, \V) = \min_{p\in P^\alpha}~ \max_{h\in \H_\alpha \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )
+\depth(\T^\alpha, \V) = \min_{p\in P^\alpha}~ \max_{\beta\in p}~ \max_{h\in \H_\alpha \cap \H^\alpha_\beta}~  ( \mi(h, p_\alpha) + \mi(h, p) )
 \]
+
 Note that the depth of a subtree rooted at $\alpha$ counts the number of (past and future) mistakes that the debate could incur with verifiers that are consistent with the path up to $\alpha$.
 The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that is $\depth(\T) = \depth(\T^\rho)$. Note that at the root node, there is no past, and thus only future mistakes are counted:
+% \[
+% \depth(\T,\V) = \depth(\T^\rho,\V) = \min_{p\in P^\rho}~ \max_{h\in \H_\V \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )  = \min_{p\in P^\rho}~ \max_{h\in \H_{\V_p}}~    \mi(h, p)
+% \]
+
 \[
-\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{p\in P^\rho}~ \max_{h\in \H_\V \cap \H_p}~  ( \mi(h, p_\alpha) + \mi(h, p) )  = \min_{p\in P^\rho}~ \max_{h\in \H_{\V_p}}~    \mi(h, p)
+\depth(\T,\V) =  \min_{p\in P^\rho}~ \max_{\beta\in p}~ \max_{h\in \H_\V \cap \H_\beta}~  ( \mi(h, p_\alpha) + \mi(h, p) )  = \min_{p\in P^\rho}~ \max_{\beta\in p}~ \max_{h\in \H_\beta}~    \mi(h, p)
 \]
-\ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
+%
+% \ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
 With this we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
 \begin{definition}[Debate Littlestone Dimension]
  Let $\V$ be a verifier class for domain $\X$, $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
@@ -195,6 +205,11 @@ Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from le
 \end{theorem}
 \ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
 
+
+
+\subsection{Non-realizable case}
+We will now consider the case in which instead of knowing a class perfectly, there exists some noise feedback, or misspecification.
+Formally, we will consider the $k$-nonrealizable case, i.e., situations in which the rounds of 
 
 \section{The Combative Case}
 % Authors are strongly encouraged to include an anonymous AI Disclosure section
