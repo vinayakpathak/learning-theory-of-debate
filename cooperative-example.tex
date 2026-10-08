@@ -1,0 +1,14 @@
+Let $\X=\naturals$, $\Y=\{0,1\}$, $\C=\{0,1\}$, and $n=1$. For $b\in\{0,1\}$, let $h_b:\X\to\Y$ be the constant function $h_b(x)=b$ and let $\H=\{h_0,h_1\}.$
+
+For every bit $b\in\{0,1\}$ and function $s:\naturals\to\{0,1\}$, define
+\[
+v_{b,s}(x,\ct,\cf)=
+\begin{cases}
+b, & \ct=s(x)\text{ or }\cf=1,\\
+1-b, & \text{otherwise}.
+\end{cases}
+\]
+And define the verifier class as $\V=\{v_{b,s}:b\in\{0,1\},\ s:\naturals\to\{0,1\}\}$. Thus verifier $v_{b,s}$ validates hypothesis $h_b$ with $\ct=s(x)$ being the winning certificate for the \dt on input $x$. If $s$ was known, then \dt would simply pick $\ct=s(x)$ once, and the verifier's output would reveal the true hypothesis no matter what certificate the \df picked. However, the issue is that $s$ needs to be learned. 
+
+On the other hand, it is quite easy for the \df to figure out the ground truth. It just needs to pick $\cf=1$ once, and the verifier's output reveals the ground truth. Thus if they were playing cooperatively, the \df would pick $\cf=1$ at the first step, revealing the ground truth, and the \dt would pick the correct label after that. However, the \df is not incentivized to do this in the combative setting. 
+
