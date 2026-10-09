@@ -19,10 +19,12 @@ The Overleaf remote branch is `main`. This setup uses direct Overleaf Git
 access, not Overleaf's GitHub synchronization feature. The local repository
 connects the remotes; they do not synchronize automatically.
 
-**Keep `.gitignore` and `AGENTS.md` on local/GitHub `main`, but exclude them from
-the active Overleaf project. Never push local `main` directly to Overleaf.**
-The two branch tips intentionally differ in these files. Git ignore rules
-cannot filter tracked files out of a push.
+**Keep `.gitignore`, `AGENTS.md`, and the entire `notes/` folder on local/GitHub
+`main`, but exclude them from the active Overleaf project. Never push local
+`main` directly to Overleaf.** The two branch tips intentionally differ in
+these paths. Notes must remain tracked and committed to GitHub; do not add
+`notes/` to `.gitignore`. Git ignore rules cannot filter tracked files out of
+a push.
 
 From local `main`, a normal `git push` targets GitHub only. This checkout also configures
 `remote.overleaf.push` as `refs/heads/overleaf-sync:refs/heads/main`, so
@@ -63,21 +65,26 @@ away either side to make their intentionally different trees match.
    remotes and integrate any new `origin/main` commits into `main`.
 2. On clean local `main`, run
    `git merge --no-ff --no-commit overleaf/main`.
-3. If a merge starts, keep the local metadata with
-   `git restore --source=HEAD --staged --worktree -- .gitignore AGENTS.md`.
-   This also resolves conflicts confined to those excluded files. Resolve all
-   manuscript conflicts normally, preserving edits from both sides.
+3. If a merge starts, keep the local metadata and notes with
+   `git restore --source=HEAD --staged --worktree -- .gitignore AGENTS.md notes`.
+   Before restoring, inspect incoming changes to `notes/`; ask the user about
+   any edits beyond the expected deletions from the filtered export. This
+   restore also resolves conflicts confined to the excluded metadata or
+   expected note deletions. Ask the user about manuscript conflicts before
+   resolving them, preserving edits from both sides.
 4. Review and commit the merge. If Git reports already up to date, no merge
-   commit is needed. Keep the two local metadata files present in either case.
+   commit is needed. Keep the local metadata and notes present in either case.
 
 `--no-ff` matters: `--no-commit` alone does not stop a fast-forward from
-removing the local metadata before it can be restored.
+removing the local metadata or notes before they can be restored.
 
 ## Publishing manuscript changes
 
-Before starting an export merge, compare the source trees. If there are no
-manuscript changes to publish and the excluded files are already absent on
-Overleaf, skip the export and push any requested `main` updates to GitHub.
+Before starting an export merge, compare the source trees excluding
+`.gitignore`, `AGENTS.md`, and `notes/`. If there are no manuscript changes to
+publish and all excluded paths are already absent on Overleaf, skip the
+export and push any requested `main` updates to GitHub. Notes-only changes
+must still be committed and pushed to GitHub.
 
 1. Commit the requested local edits, then fetch again and import any new
    collaborator changes using the procedure above.
@@ -85,21 +92,23 @@ Overleaf, skip the export and push any requested `main` updates to GitHub.
    If this branch is missing, create it from `overleaf/main`. Integrate any
    new `overleaf/main` commits on the sync branch before exporting.
 3. In that worktree, merge reconciled `main` using
-   `git merge --no-ff --no-commit main`. Resolve manuscript conflicts normally.
-   Before committing, remove the excluded files with
-   `git rm -f --ignore-unmatch -- .gitignore AGENTS.md`.
+   `git merge --no-ff --no-commit main`. Ask the user about manuscript conflicts
+   before resolving them. Before committing, remove the excluded paths with
+   `git rm -r -f --ignore-unmatch -- .gitignore AGENTS.md notes`.
 4. Review the staged result and commit the export merge. The source files
-   should match reconciled `main`; neither excluded file may be in the export
-   tree. Finish or abort any started merge before removing its worktree.
+   outside the excluded paths should match reconciled `main`; none of
+   `.gitignore`, `AGENTS.md`, or `notes/` may be in the export tree. Finish or
+   abort any started merge before removing its worktree.
 5. Push with `git push overleaf overleaf-sync:main`, then
    `git push origin main`. Remove the clean temporary worktree when finished.
 6. If a push is rejected because new edits arrived, fetch and integrate them
    before retrying. Never use force. Report which remotes were updated.
 
 The local `.git/hooks/pre-push` guard rejects pushes to this Overleaf project
-if the pushed tree contains `.gitignore` or `AGENTS.md`. It does not affect
-GitHub pushes. This guard and the default push mapping are machine-local;
-do not bypass the guard to publish an unfiltered branch.
+if the pushed tree contains `.gitignore`, `AGENTS.md`, or anything under
+`notes/`. It does not affect GitHub pushes. This guard and the default push
+mapping are machine-local; do not bypass the guard to publish an unfiltered
+branch.
 
 ## Files and review comments
 
