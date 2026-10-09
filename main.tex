@@ -121,11 +121,35 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 \ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
 \vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
 
+\vinayak{For all three of $\Mi(T), \Lo_T(T)$, and $\Lo_F(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Thus we define \emph{debate regret} as $\Re(T) = \Mi(T) - k$, and \dt's regret as $\Re_T(T) = \Lo_T(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \Lo_F(T) - \#\text{rounds that are misspecified or unachievable}$. }
+
 The number of rounds may be finite ($T\in\naturals$) or infinite ($T = \infty$).
 We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater \dt is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater \df on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater \df, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
 The value of the overall debate that the two debaters produce is measured by assessing whether through their interactions with the verifier the hypothesized label of the proposer (eventually) agrees with the true, yet unrevealed, label $y^*$ that the environment responds with.
 % The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $y^*_t$ in each round.
 
+\vinayak{
+\begin{claim}
+  $\Re(T) \leq \Re_T(T) + \Re_F(T) + k$.
+\end{claim}
+\begin{proof}
+Let $u$ be the number of unachievable rounds that are not misspecified. By definition, there cannot be any mistakes on these $u$ rounds. Thus
+\[
+\Mi(T) \leq T-u = \Lo_T(T)+\Lo_F(T)-u.
+\]
+Subtracting $k$ from both sides and using the definitions of $\Re(T)$ and $\Re_T(T)$ gives
+\[
+\Re(T) \leq \Re_T(T)+\Lo_F(T)-u.
+\]
+But
+\begin{align*}
+\Lo_F(T)-u
+&= \Re_F(T)+\#\text{misspecified rounds}\\
+&\leq \Re_F(T)+k.
+\end{align*}
+Substituting, we get $\Re(T) \leq \Re_T(T)+\Re_F(T)+k$.
+\end{proof}
+}
 We will study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation. We will distinguish between the \emph{cooperative case} and the \emph{combative case}. In the cooperative case both debaters are acting cooperatively so as to minimize the debate evaluation measures. We can think of this as a scenario where debater \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions having taking into account relevant potential counter-arguments. In contrast, in the combative case, both debaters are acting in a way to minimize their own evaluation measures respectively. Thus in this case, even debater true may put up hypothesized labels $\hy_t$ that it knows it can argue for even through it is already aware the this does not correspond to the underlying truth $y^*_t$. We study whether the true underlying hypotheses can be recovered in both scenarios.
 
 \vinayak{I'm not sure that I like the names ``cooperative'' and ``combative''. The point of studying the cooperative version was to understand the best way to use access to this kind of verifiers. The ``debate'' thesis is that the best way to use such a verifier is to set up two debaters and let them argue against each other. But we don't think that should be the case. So the question is, if we don't restrict ourselves to set up these debaters and simply understand the best way to use these verifiers, what's the best that can be done? So ``cooperative'' is really just more general and ``combative'' is more restrictive. This should be reflected in the names somehow.}
