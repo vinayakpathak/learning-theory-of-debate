@@ -80,7 +80,7 @@ Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \
 % }
 In this case, we also say that $v$ is a verifier for hypothesis $h$. We call a verifier \emph{valid} if there exists a hypothesis $h$ that is validated by $v$.
 \end{definition}
-Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}\vinayak{Yes this is true, and I think this is kind of important, so we should keep it this way.}
+Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. We will use notation $h_v$ for this hypothesis when we want to make this relationship between verifier and its hypothesis explicit. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}\vinayak{Yes this is true, and I think this is kind of important, so we should keep it this way.}
 % ~\vinayak{Oh I see. I have been thinking of verifiers as uniquely defining a hypothesis. Given an $x$ and a $v$, I think only one unique label should meet the condition above, and that label will define a unique hypothesis. I think Tosca is saying the same thing below.}. 
 We will call a set of valid verifiers a \emph{verifiers class}, and use notation $\V$ to denote a verifier class. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
 For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier class} $\V$ if $\H = \H_\V$.
@@ -102,27 +102,29 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
   \item Debater \df brings argument $\cf^i_t$ (aiming to falsify label $\hy_t$)
  \end{itemize}
  \item The verifier $v^*$ reveals $\vy_t = v(x, \ct^1_t, \cf^1_t, \ct^2_t, \cf^2_t, \ldots,  \ct^n_t, \cf^n_t)$\\
-       The environment records (but does not reveal) $\ty_t = h^*(x_t)$
+       The environment records (but does not reveal) $\ty_t = h^*(x_t)$ \ruth{Should this be here? Or does it look like the environment is committing to more than we intend? Should we rather let the environment explicitly choose the labels $y^*$ only after the $T$ rounds of debate? But what would this mean if $T$ is infinite? I'll keep the statements that the true labels are recoded here, but please comment on what you think is the right formaliztion}~\vinayak{I'm not sure it matters, since we want to prove our bounds for the worst-case environment. A similar thing happens in standard binary classification, right? We can either say that nature picks an $h^*$ before the game begins, and then ask that our algorithm gets a finite mistake against all nature choices, or we can say that nature picks a $y$ at each time step as long as the version space remains non-empty. Both lead to the same bounds?}
 \end{enumerate}
 \item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
 \begin{align*}
- \Mi(T) = \sum_{t = 1}^T [\hy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
+ \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
 \end{align*}~\vinayak{We intended this to be $[\hat{y} \neq y^*]$}
 \item Debater \dt is evaluated through its \emph{loss} and its \emph{regret}
 \begin{align*}
- \Lo_T(T) = \sum_{t = 1}^T [\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
+ \Lo_T(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
 \end{align*}
 \ruth{In the realizable case all rounds are achievable for \dt, but probably not in the agnostic case?} \tosca{We got into a debate about how to formalize this in our meeting in Hamilton last week as well. In other settings we often just deducted $k$ (the number of exceptions), which may be an overestimation of non-achievable rounds. }
 \item Debater \df is evaluated through \emph{loss} and its \emph{regret}
 \begin{align*}
- \Lo_F(T) = \sum_{t = 1}^T [\vy_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \Lo_F(T) - \#\text{unachievable rounds for \df}
+ \Lo_F(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \Lo_F(T) - \#\text{unachievable rounds for \df}
 \end{align*}
 \end{itemize}
 \ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
 \vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
 
 The number of rounds may be finite ($T\in\naturals$) or infinite ($T = \infty$).
-We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater \dt is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater \df on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater \df, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $y^*_t$ in each round.
+We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater \dt is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater \df on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater \df, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
+The value of the overall debate that the two debaters produce is measured by assessing whether through their interactions with the verifier the hypothesized label of the proposer (eventually) agrees with the true, yet unrevealed, label $y^*$ that the environment responds with.
+% The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $y^*_t$ in each round.
 
 We will study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation. We will distinguish between the \emph{cooperative case} and the \emph{combative case}. In the cooperative case both debaters are acting cooperatively so as to minimize the debate evaluation measures. We can think of this as a scenario where debater \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions having taking into account relevant potential counter-arguments. In contrast, in the combative case, both debaters are acting in a way to minimize their own evaluation measures respectively. Thus in this case, even debater true may put up hypothesized labels $\hy_t$ that it knows it can argue for even through it is already aware the this does not correspond to the underlying truth $y^*_t$. We study whether the true underlying hypotheses can be recovered in both scenarios.
 
@@ -164,9 +166,9 @@ For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta
 
 For version spaces, we may use the shorthand notations $\V^\alpha_\beta = \V_{p^\alpha_\beta}$ and $\V_\beta = \V_{p_\beta}$. That is $\V_\beta$ is the verifier version space at a node $\beta$ in the tree: $\V_\beta$ contains exactly those verifiers that are consistent with the debate protocol as run from the beginning $\rho$ to node $\beta$ in the tree. Analogously, we use $\H^\alpha_\beta$ and $\H_\beta$ for the corresponding induced hypothesis version spaces.
 
-For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagreements between $h$ and the recorded labels on path $p$. That is
+For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagreements between $h$ and the hypothesized labels the edges of path $p$. That is
 \[
- \mi(h, p) = \sum_{(\alpha, \beta)\in p}\indct[h(x_\alpha)\neq \vy_\beta]
+ \mi(h, p) = \sum_{(\alpha, \beta)\in p}\indct[h(x_\alpha)\neq \hy_\beta]
 \]
 Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred with respect to candidate verifier $v$.
 
