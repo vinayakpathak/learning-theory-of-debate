@@ -87,7 +87,7 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 
 % \tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
 
-\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, we assume that there are at most $k$ \emph{misspecified} rounds where the true label can be different from the one assigned by $h^*$.} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
+\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, $h^*$ can be anything, but we assume that it differs from the unique $h$ corresponing to $v^*$ at at most $k$ rounds. We call these \emph{misspecifications} and the corresponding rounds \emph{misspecified rounds}.} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
 
 \paragraph{The debate protocol}
 
@@ -107,10 +107,10 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 \item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
 \begin{align*}
  \Mi(T) = \sum_{t = 1}^T [\hy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
-\end{align*}~\vinayak{We intended this to be $[\hat{y} \neq y^*]$}
+\end{align*}
 \item Debater \dt is evaluated through its \emph{loss} and its \emph{regret}
 \begin{align*}
- \Lo_T(T) = \sum_{t = 1}^T [\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{unachievable rounds for \dt}
+ \Lo_T(T) = \sum_{t = 1}^T [\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \Lo_T(T) - \#\text{misspecified rounds}
 \end{align*}
 \ruth{In the realizable case all rounds are achievable for \dt, but probably not in the agnostic case?} \tosca{We got into a debate about how to formalize this in our meeting in Hamilton last week as well. In other settings we often just deducted $k$ (the number of exceptions), which may be an overestimation of non-achievable rounds. }
 \item Debater \df is evaluated through \emph{loss} and its \emph{regret}

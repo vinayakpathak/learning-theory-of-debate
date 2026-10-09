@@ -1,0 +1,245 @@
+% Standalone note. From the repository root, compile with:
+% latexmk -pdf -outdir=.vscode/latex-build/notes notes/stackelberg-counterexample.tex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{xspace}
+
+\newcommand{\X}{\mathcal X}
+\newcommand{\Y}{\mathcal Y}
+\newcommand{\C}{\mathcal C}
+\renewcommand{\H}{\mathcal H}
+\newcommand{\V}{\mathcal V}
+\newcommand{\Lo}{\mathcal L}
+\renewcommand{\Re}{\mathcal R}
+\newcommand{\Mi}{\mathcal M}
+\newcommand{\hy}{\hat y}
+\newcommand{\vy}{\tilde y}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\dt}{\texttt{Proposer}\xspace}
+\newcommand{\df}{\texttt{Responder}\xspace}
+
+\title{A regret-based Stackelberg equilibrium with linear prediction mistakes}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+We give a verifier class where cooperation makes at most one prediction
+mistake, but a Stackelberg equilibrium for the debaters' individual regrets
+has linearly many expected mistakes. The \df can achieve zero regret
+without learning the true label. Its responses then leave the \dt dependent
+on guessing a rare certificate. A different, cooperative query reveals the
+true label immediately.
+
+We use a Bayesian Stackelberg game. Both players know a common prior over
+verifiers, and their objectives are expected individual regrets under this
+prior. The verifier is sampled once and remains fixed. In particular, the
+equilibrium claim below concerns this common-prior game, rather than
+separately taking a worst case over verifiers for each player.
+
+\section{Verifier class and feedback}
+
+Let $\X=\{1,2,\ldots\}$, $\Y=\{0,1\}$, and
+$\C=\{0,1,2,\ldots\}$. For each $x\in\X$, define the finite set
+\[
+S_x=\{3,4,\ldots,4x(x+1)+2\},
+\qquad |S_x|=4x(x+1).
+\]
+For $b\in\{0,1\}$ and a function $s$ satisfying $s(x)\in S_x$ for every
+$x$, define
+\[
+v_{b,s}(x,p,r)=
+\begin{cases}
+b, & p=s(x)\text{ or }r=b,\\
+1-b, & \text{otherwise}.
+\end{cases}
+\]
+The verifier class and hypothesis class are
+\[
+\V=\{v_{b,s}:b\in\{0,1\},\ s(x)\in S_x\text{ for all }x\},
+\qquad
+\H=\{h_0,h_1\},\quad h_b(x)=b.
+\]
+Each $v_{b,s}$ validates exactly $h_b$. The certificate $p=s(x)$ forces
+output $b$ against every response. Conversely, $r=b$ always forces output
+$b$, so no proposer certificate can force $1-b$ against every response.
+If $p\ne s(x)$, a response different from $b$ gives output $1-b$.
+Thus $s(x)$ is the unique winning proposer certificate.
+
+The prior samples $b$ uniformly from $\{0,1\}$ and, independently,
+samples each $s(x)$ uniformly from $S_x$. Neither player sees the sampled
+$b$ or $s$. Their private random coins are independent of these samples.
+
+Fix a finite horizon $T$ and present the distinct inputs $x_t=t$. In each
+round, the \dt announces $\hy_t$ and $p_t$. After observing both, the \df
+chooses $r_t$. Both players then observe
+$\vy_t=v_{b,s}(t,p_t,r_t)$. Their policies may depend on the complete
+public history and their private randomness. They have no additional
+queries to the verifier, and the true label is not separately revealed.
+
+\section{Regrets and the Stackelberg objective}
+
+Prediction mistakes compare the proposed label with the true label:
+\[
+\Mi(T)=\sum_{t=1}^T\ind[\hy_t\ne b].
+\]
+The individual contest losses are
+\[
+\Lo_T(T)=\sum_{t=1}^T\ind[\vy_t\ne\hy_t],
+\qquad
+\Lo_F(T)=\sum_{t=1}^T\ind[\vy_t=\hy_t].
+\]
+Every round is achievable for a \dt that knows the verifier and may choose
+both its label and its certificate. Hence its regret benchmark is zero,
+and $\Re_T(T)=\Lo_T(T)$.
+
+A round is unachievable for the \df exactly when the proposed label is
+correct and the proposer certificate is winning. Define
+\[
+U_F(T)=\sum_{t=1}^T\ind[\hy_t=b,\ p_t=s(t)],
+\qquad
+\Re_F(T)=\Lo_F(T)-U_F(T).
+\]
+Every unachievable round contributes one to $\Lo_F$. Consequently each
+round's contribution to $\Re_F$ is nonnegative. We do not subtract a round
+merely because $p_t=s(t)$ when the proposed label is wrong.
+
+Let $A$ and $B$ denote the complete history-dependent policies of the \dt
+and \df. The \dt commits to $A$ before play, and the \df observes this
+policy before choosing $B$. The commitment does not reveal private random
+coins or the sampled verifier. Write $\Re_i(A,B;T)$ for the resulting
+regret. A follower best-response map $B^*$ and a leader policy $A^*$ form
+a Stackelberg equilibrium if
+\begin{align*}
+B^*(A)&\in\operatorname*{arg\,min}_{B}
+    \mathbb E[\Re_F(A,B;T)] \qquad\text{for every }A,\\
+A^*&\in\operatorname*{arg\,min}_{A}
+    \mathbb E[\Re_T(A,B^*(A);T)].
+\end{align*}
+All expectations include the initially sampled verifier and the players'
+randomness. Both objectives are individual regrets, rather than raw
+loss for one player and regret for the other.
+
+\section{A response with zero regret}
+
+Consider the responder policy $B_0$ that always chooses
+\[
+r_t=1-\hy_t.
+\]
+This policy achieves $\Re_F(T)=0$ for every proposer policy and every fixed
+verifier. If $\hy_t\ne b$, then $r_t=b$ and the \df wins. If $\hy_t=b$
+but $p_t\ne s(t)$, then $r_t\ne b$, the verifier outputs $1-b$, and the
+\df again wins. The only remaining case has $\hy_t=b$ and $p_t=s(t)$.
+The \df loses in this case, but the round is unachievable and the loss is
+subtracted.
+
+Since responder regret is nonnegative, $B_0$ is an exact best response to
+every proposer commitment. Moreover, unless the \dt guesses the correct
+certificate, the feedback is
+\[
+p_t\ne s(t)
+\quad\Longrightarrow\quad
+(r_t,\vy_t)=(1-\hy_t,1-\hy_t).
+\]
+This feedback has the same form for both possible values of $b$.
+
+\section{Linear prediction mistakes}
+
+Fix any proposer policy $A$. Couple two runs against $B_0$, one with $b=0$
+and one with $b=1$, using the same function $s$ and the same proposer
+random coins. Until the first round with $p_t=s(t)$, the two runs have
+identical histories and therefore identical proposed labels and
+certificates.
+
+Let $\tau$ be this first certificate hit, with $\tau=\infty$ if there is
+none. Conditional on no earlier hit, the fresh value $s(t)$ is still
+uniform on $S_t$ and independent of the current certificate choice.
+Therefore
+\[
+\Pr(\tau=t\mid\tau\ge t)\le\frac{1}{4t(t+1)}.
+\]
+Using the union bound and a telescoping sum gives
+\[
+\Pr(\tau\le T)
+\le\sum_{t=1}^T\frac{1}{4t(t+1)}
+=\frac14\left(1-\frac{1}{T+1}\right)
+\le\frac14.
+\]
+Let $\Mi_0(T)$ and $\Mi_1(T)$ be the mistake counts in the two coupled
+runs. On $\{\tau>T\}$, the same prediction is made in both worlds each
+round, so $\Mi_0(T)+\Mi_1(T)=T$. Averaging over the fair bit $b$ yields
+\[
+\mathbb E[\Mi(T)]
+=\frac12\mathbb E[\Mi_0(T)+\Mi_1(T)]
+\ge\frac T2\Pr(\tau>T)
+\ge\frac{3T}{8}.
+\]
+This holds for every proposer policy, including one that optimally
+minimizes its own regret against $B_0$.
+
+\section{Existence of an equilibrium and follower ties}
+
+Set $B^*(A)=B_0$ for every leader commitment $A$. This is a best-response
+map by the zero-regret argument. For each finite horizon, choose $A_T^*$
+to minimize $\mathbb E[\Re_T(A,B_0;T)]$.
+
+Such a minimizer exists. Against $B_0$, all proposer certificates outside
+$S_t$ are equivalent to $p_t=2$, since the verifier only checks whether
+$p_t=s(t)$ and $B_0$ does not depend on $p_t$. The relevant action and
+observation sets are therefore finite at each of the finitely many
+rounds. Backward induction gives an optimal policy. Thus
+$(A_T^*,B^*)$ is a Stackelberg equilibrium satisfying
+\[
+\Re_F(T)=0,
+\qquad
+\mathbb E[\Mi(T)]\ge\frac{3T}{8}.
+\]
+The optimal leader policy may depend on $T$, but the class, prior, and
+input sequence are the same for every horizon.
+
+The mistake lower bound also survives other choices among exact follower
+best responses. Every best response has expected regret zero, and so
+cannot incur a positive regret increment with positive probability.
+Inductively, before a certificate hit, both values of $b$ have positive posterior
+probability. Also, the fresh certificate misses $s(t)$ with positive
+probability. If the \df chose any $r_t\ne1-\hy_t$, then on the event
+\[
+b=1-\hy_t,\qquad p_t\ne s(t),
+\]
+the verifier would output $\hy_t$. This would be an avoidable responder
+loss, contradicting zero expected regret. Hence every exact follower
+best response must use $r_t=1-\hy_t$ before the first hit. The same
+coupling proof applies to every such response. Favorable tie-breaking
+therefore cannot remove the prediction-mistake lower bound.
+
+\section{Cooperative learning}
+
+Cooperatively, choose $p_1=r_1=2$. Since $s(1)\ge3$ and
+$b\in\{0,1\}$, this query gives
+\[
+v_{b,s}(1,2,2)=1-b.
+\]
+Both players can recover $b$ from the output. Thereafter the \dt always
+predicts $b$, so $\Mi(T)\le1$ for every fixed verifier. The \df can also
+choose $r_t=b$ thereafter to make the verifier itself output the true
+label, regardless of the proposer certificate.
+
+Thus the same verifier class permits learning the label with one
+cooperative query, while exact regret-based Stackelberg play can keep it
+hidden. The expectation in the equilibrium lower bound is over the
+common prior; it is not a claim that every fixed verifier is hard. For
+each horizon and policy pair covered by the bound, averaging does imply
+that some fixed verifier has at least $3T/8$ expected mistakes over the
+players' randomness.
+
+The use of exact best responses matters. The diagnostic query $p=r=2$
+incurs positive expected responder regret, so it is excluded by the
+zero-regret alternative. An additive constant tolerance would permit
+such a query. The argument above does not rule out accurate approximate
+equilibria.
+
+\end{document}
