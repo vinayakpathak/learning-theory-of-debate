@@ -1,4 +1,5 @@
 \documentclass[anon]{alt2027} % submission template (anonymized)
+\DeclareMathOperator*{\argmin}{arg\,min}
 %\documentclass[final]{alt2027} % camera-ready template (de-anonymized)
 
 % The following packages will be automatically loaded:
@@ -251,7 +252,7 @@ Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothes
 
 \begin{proof}
 Assume $\dldim(\V, n) = d$. Since $d\in\naturals$ is finite, there exists a debate tree $\T$ with $\depth(\T,\V) = d$. 
-Since every path in $\T$ is finite, and the fan-out of the three $\T$ is finite (for finite certificate space) the definition of depth
+Since every path in $\T$ is finite, and the fan-out of the tree $\T$ is finite (for finite certificate space) the definition of depth
 \[
 \depth(\T,\V) =  \min_{p\in P^\rho}~  \max_{h\in \H_p}~ \mi(h, p)
 \]
@@ -264,28 +265,85 @@ implies that there is uniform upper bound $b < \infty$, such that the $d$ mistak
 % \ruth{For trees: there does not exist a tree with finite fan-out and arbitrarily long paths, that does not also have an infinite path. But with infinite fan-out this is not true, one can have a node with finite paths of every length starting at that node... }
 \end{proof}
 
-For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol has run for a number of steps, recorded in a path $q$ (of a debate tree). Then the current verifier version space is $\V_q$. An optimal learner needs to take the action $(\hy, \sc)$ that minimizes the maximal number of mistakes the environment will be able to enforce. The environment can enforce mistakes by combining past mistakes that happened on $q$ with future mistakes that may happen in a debate tree from this point on \emph{through the same function $h$}. Thus, our learner chooses $(\hy, \sc)$ that minimizes
+For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol is now in round $t$, and let \sout{$q$} \sivan{$p_t$} be the path (of a debate tree) recording the previous rounds. Letting $x_t,\hy_t,\sc_t,\vy_t$ be the record of round $t$, we define $p_t$ to include $x_t$ but not $\hy_t,\sc_t,\vy_t$.
+
+
+Then the current verifier version space is \sout{$\V_q$} \sivan{$\V_{p_t}$}. An optimal learner needs to take the action $(\hy, \sc)$ that minimizes the maximal number of mistakes the environment will be able to enforce. The environment can enforce mistakes by combining past mistakes that happened on \sout{$q$}\sivan{$p_t$} with future mistakes that may happen in a debate tree from this point on \emph{through the same function $h$}. Thus, our learner chooses $(\hy, \sc)$ that minimizes
+\sout{
+%\[
+$Q = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})} ~\min_{p\in\T^\rho} ~\max_{h\in \H_p\cap \H_{(q,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,q)),$
+%\]
+}
+\sivan{
 \[
-Q = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})} ~\min_{p\in\T^\rho} ~\max_{h\in \H_p\cap \H_{(q,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,q)),
+Q_t(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q) +\indct[h(x_t) \neq \hat{y}]),
 \]
-where we use the notation $(q,\hy, \sc, \vy)$ for the path $q$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. Note that for the version spaces defined through this expanded path, the domain point component of the  environment response is not relevant, and we this omit it here to not overload the notation.
+The learner chooses a pair in $\argmin_{\hy, \sc}Q_t(\hy, \sc)$.
+}
+
+
+\sivan{another reason we may want to stick with finite $\bar{c}$ (or at least assume some compactness) is because otherwise there might not be a minimum here for the SOA to choose}\ruth{I think since these are integers lower bounded by $0$, it should be ok? But I am happy with finite $\C$, since the sup/inf issues would show up at multiple spots and we don't have much time..}
+
+where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. Note that for the version spaces defined through this expanded path, the domain point component $x_t$\ruth{$x_{t+1}$} of the  environment response is not relevant, and we this omit it here to not overload the notation.
 
 \begin{lemma}
- Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, at every step of the SOA learner above, the quantity $Q$ above is bounded by the debate Littlestone dimension.
+ Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, at every step \sivan{$t$} of the SOA learner above, \sivan{$\min_{\hy,\sc} Q_t(\hy,\sc) \leq d$. }
+  \sout{the quantity $Q$ above is bounded by the debate Littlestone dimension }
 \end{lemma}
+\sivan{also need to observe that this means no more than d mistakes overall}
 \begin{proof}
-Let $\T^w$ be a (worst case) debate tree for the class $\V$ of depth $d$. Since at each node, there is an outgoing edge for each possible  action $(\hy, \sc)$ of the learner, the environment can use the responses in $\T^w$ to ensure that the debaters will suffer at least $d$ mistakes independently of their choices.
+
+Let $\T^w$ be a (worst case) debate tree for the class $\V$ of depth $d$. Since at each node, there is an outgoing edge for each possible  action $(\hy, \sc)$ of the learner, the environment can use the responses in $\T^w$ to ensure that the debaters will suffer at least $d$ mistakes, independently of their choices.
 
 On the other hand, if there existed a step (ie node $\alpha$ in $\T$), where the quantity $Q$ was larger than $d$, this implies that for all possible learner actions $(\hy, \sc)$, there existed a choice $\vy$ for the verifier such that there existed a tree $\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})$ with 
 \[
 ~\min_{p\in\T^\rho} ~\max_{h\in \H_{p_\alpha}\cap \H_{(p_\alpha,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,p_\alpha)) > d
 \]
-Thus, this choice $\vy$ would be instantiated in the worst case tree $\T^w$ and thus the tre $\T^w$ has a node $\alpha$ with  $\depth(\T^\alpha, \V) > d$, a contraction to the lemma below.
+Thus, this choice $\vy$ would be instantiated in the worst case tree $\T^w$ and thus the tree $\T^w$ has a node $\alpha$ with  $\depth(\T^\alpha, \V) > d$, a contraction to the lemma below.
+\sivan{ New proof (work in progress):
+
+For an instance $x$, define the set of trees $\Delta_n(\V,x)$ to be the set of trees in $\Delta_n(\V)$ that have $x$ at the root.
+Define the set of trees $\Delta_n(\V,x,\hat{y},\sc)$ to be the set of trees that result from taking any tree from $\Delta_n(\V,x)$ and removing all the edges coming out of $x$ except the one labeled $\hat{y},\sc$. 
+
+Consider a round $t$ in some run of SOA. We have
+\begin{align*}
+  &\min_{\hat{y},\bar{c}}Q_t(\hat{y},\bar{c}) = \min_{\hat{y},\bar{c}} \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q)+\indct[h(x_t) = \hat{y}])\\
+  &\leq
+    \min_{\hat{y},\bar{c}}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))
+\end{align*}
+Let 
+\[
+q_\T \in \argmin_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q)),
+\]
+and denote the value it obtains $f(q_\T)$. 
+Note that $q_\T$ must start with $(x_t,\hy,\sc)$. Let $q'_\T$ be the rest of the path of $q_\T$ and write $q_\T = (x_t,\hy,\sc);q'_\T$. 
+Then we have 
+\begin{align*}
+&\min_{\hat{y},\bar{c}}Q_t(\hat{y},\bar{c})  \leq \min_{\hat{y},\bar{c}}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} f(q_\T) = 
+\min_{\hat{y},\bar{c}}\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} f((x_t,\hy,\sc);q'_\T)\\
+&= \min_{\hat{y},\bar{c}}\sup_{\T\in\Delta_n(\V_{p_t},x_t)} f((x_t,\hy,\sc);q'_\T)
+\end{align*}
+
+xxxxx
+
+\begin{align*}
+??&\leq \sup_{\T\in\Delta_n(\V_{p_t},x_t)} ~\min_{\hat{y},\bar{c}}\min_{q'\in\T^\rho} f((x_t,\hy,\sc);q')\\
+  &= \sup_{\T\in\Delta_n(\V_{p_t},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_{t}) + \mi(h,q))
+  \\
+  &= \sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}_{t-1}])
+  \\
+  &\leq \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}_{t-1}])
+\\   
+  &=\min_{\hat{y},\bar{c}}\max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}]) \\
+  &= \min_{\hat{y},\bar{c}}Q_{t-1}(\hat{y},\bar{c}).
+\end{align*}
+}
 \end{proof}
+
 
 \ruth{The following still needs to be shown, but should be ok:}
 \begin{lemma}
-Let $\T$ be a debate tre and let $\alpha$ be a node in $\T$. Then
+Let $\T$ be a debate tree and let $\alpha$ be a node in $\T$. Then
 \[
 \depth(\T^\alpha, \V) \leq \depth(\T, \V)
 \]
