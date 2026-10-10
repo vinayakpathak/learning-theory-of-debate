@@ -1,5 +1,6 @@
 \documentclass[anon]{alt2027} % submission template (anonymized)
 \DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 %\documentclass[final]{alt2027} % camera-ready template (de-anonymized)
 
 % The following packages will be automatically loaded:
@@ -231,7 +232,7 @@ With this we are ready to define the \emph{debate Littlestone dimension} for deb
 \begin{definition}[Debate Littlestone Dimension]
  Let $\V$ be a verifier class for domain $\X$, $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
  \[
-  \dldim(\V, n) = \sup_{\T\in\Delta_n} \depth(\T,\V)
+  \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V)
  \]
 If the length $n$ is fixed (or clear from context) we will also use the shorthand notation $\dldim(\V) =   \dldim(\V, n)$.
 \end{definition}
@@ -241,7 +242,7 @@ We will show that the debate Littlestone dimension characterizes when a hypothes
 Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if there is a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
 \end{theorem}
 \ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
-
+\sivan{I don't think this holds. You could have a verifier class that reveals H exactly using "hidden" values, while another class does not. I'm not sure if we need a dimention for H though}
 We start by showing that the debate Little stone dimension induces a lower bound on the number of mistakes that the environment can enforce.
 
 \begin{lemma}
@@ -277,23 +278,23 @@ $Q = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})} ~\min_{p
 }
 \sivan{
 \[
-Q_t(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q) +\indct[h(x_t) \neq \hat{y}]),
+Q_t(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q) +\indct[h(x_t) \neq \hy]),
 \]
 The learner chooses a pair in $\argmin_{\hy, \sc}Q_t(\hy, \sc)$.
 }
 
 
-\sivan{another reason we may want to stick with finite $\bar{c}$ (or at least assume some compactness) is because otherwise there might not be a minimum here for the SOA to choose}\ruth{I think since these are integers lower bounded by $0$, it should be ok? But I am happy with finite $\C$, since the sup/inf issues would show up at multiple spots and we don't have much time..}
 
-where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. Note that for the version spaces defined through this expanded path, the domain point component $x_t$\ruth{$x_{t+1}$} of the  environment response is not relevant, and we this omit it here to not overload the notation.
+
+where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. Note that for the version spaces defined through this expanded path, the domain point component $x_{t+1}$ of the  environment response is not relevant, and we this omit it here to not overload the notation.
 
 \begin{lemma}
- Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, at every step \sivan{$t$} of the SOA learner above, \sivan{$\min_{\hy,\sc} Q_t(\hy,\sc) \leq d$. }
+ Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) \in \naturals$. Then, at every step $t$ of the SOA learner above, \sivan{$\min_{\hy,\sc} Q_t(\hy,\sc) \leq \dldim(\V, n)$. }
   \sout{the quantity $Q$ above is bounded by the debate Littlestone dimension }
+  \sivan{Moreover, $\dldim(\V, n)$ is also an upper bound on the total number of mistakes that the SOA learner makes during the run.}
 \end{lemma}
-\sivan{also need to observe that this means no more than d mistakes overall}
 \begin{proof}
-
+\iffalse
 Let $\T^w$ be a (worst case) debate tree for the class $\V$ of depth $d$. Since at each node, there is an outgoing edge for each possible  action $(\hy, \sc)$ of the learner, the environment can use the responses in $\T^w$ to ensure that the debaters will suffer at least $d$ mistakes, independently of their choices.
 
 On the other hand, if there existed a step (ie node $\alpha$ in $\T$), where the quantity $Q$ was larger than $d$, this implies that for all possible learner actions $(\hy, \sc)$, there existed a choice $\vy$ for the verifier such that there existed a tree $\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})$ with 
@@ -301,44 +302,73 @@ On the other hand, if there existed a step (ie node $\alpha$ in $\T$), where the
 ~\min_{p\in\T^\rho} ~\max_{h\in \H_{p_\alpha}\cap \H_{(p_\alpha,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,p_\alpha)) > d
 \]
 Thus, this choice $\vy$ would be instantiated in the worst case tree $\T^w$ and thus the tree $\T^w$ has a node $\alpha$ with  $\depth(\T^\alpha, \V) > d$, a contraction to the lemma below.
-\sivan{ New proof (work in progress):
+\fi
+
+
+\sivan{ New proof below}:
 
 For an instance $x$, define the set of trees $\Delta_n(\V,x)$ to be the set of trees in $\Delta_n(\V)$ that have $x$ at the root.
-Define the set of trees $\Delta_n(\V,x,\hat{y},\sc)$ to be the set of trees that result from taking any tree from $\Delta_n(\V,x)$ and removing all the edges coming out of $x$ except the one labeled $\hat{y},\sc$. 
+Define the set of trees $\Delta_n(\V,x,\hy,\sc)$ to be the set of trees that result from taking any tree from $\Delta_n(\V,x)$ and removing all the edges coming out of $x$ except the one labeled $\hy,\sc$. 
 
-Consider a round $t$ in some run of SOA. We have
+First, we show that $\min_{\hy,\sc}Q_t(\hy,\sc)$ is non increasing in $t$. Consider a round $t$ in some run of SOA. We have
 \begin{align*}
-  &\min_{\hat{y},\bar{c}}Q_t(\hat{y},\bar{c}) = \min_{\hat{y},\bar{c}} \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q)+\indct[h(x_t) = \hat{y}])\\
+  &\min_{\hy,\sc}Q_t(\hy,\sc) = \min_{\hy,\sc} \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q)+\indct[h(x_t) = \hy])\\
   &\leq
-    \min_{\hat{y},\bar{c}}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))
+    \min_{\hy,\sc}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hy,\sc)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))
 \end{align*}
+Denote $f(q) := \max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))$.
 Let 
 \[
-q_\T \in \argmin_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q)),
+q_\T \in \argmin_{q\in\T^\rho} f(q).
 \]
-and denote the value it obtains $f(q_\T)$. 
-Note that $q_\T$ must start with $(x_t,\hy,\sc)$. Let $q'_\T$ be the rest of the path of $q_\T$ and write $q_\T = (x_t,\hy,\sc);q'_\T$. 
+Note that if $\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)$ then $q_\T$ must start with $(x_t,\hy,\sc)$. Let $q'_\T$ be the rest of the path of $q_\T$ and write $q_\T = (x_t,\hy,\sc);q'_\T$. 
 Then we have 
 \begin{align*}
-&\min_{\hat{y},\bar{c}}Q_t(\hat{y},\bar{c})  \leq \min_{\hat{y},\bar{c}}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} f(q_\T) = 
-\min_{\hat{y},\bar{c}}\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hat{y},\bar{c})} f((x_t,\hy,\sc);q'_\T)\\
-&= \min_{\hat{y},\bar{c}}\sup_{\T\in\Delta_n(\V_{p_t},x_t)} f((x_t,\hy,\sc);q'_\T)
+&\min_{\hy,\sc}Q_t(\hy,\sc)  \leq \min_{\hy,\sc}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hy,\sc)} f(q_\T) = 
+\min_{\hy,\sc}\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hy,\sc)} f((x_t,\hy,\sc);q'_\T) =: R
+%&= \min_{\hy,\sc}\sup_{\T\in\Delta_n(\V_{p_t},x_t)} f((x_t,\hy,\sc);q'_\T)
 \end{align*}
+\sivan{do we need this to be compact to choose $\T^*$??? it suffices that the value is bounded, verify}
 
-xxxxx
+Define $\T_{\hy,\sc} \in \argmax_{\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)}f((x_t,\hy,\sc);q'_\T)$ 
+and let $\T^*$ be the tree constructed by joining each of the trees $\T_{\hy,\sc}$ at the root $x_t$. Note that $\T^* \in \Delta_n(\V_{p_t},x_t)$. Let $X_{\hy,\sc}$ be the set of paths that start with $(x_t, \hy,\sc)$.
 
+\[
+\min_{q \in (\T^*)^\rho} f(q) = \min_{\hy,\sc} \min_{q \in \T^*\cap X_{\hy,\sc}} f(q) = \min_{\hy,\sc}f((x_t,\hy,\sc);q'_{\T_{\hy,\sc}}) = R.
+\]
+Hence,
+\[
+\sup_{\T \in \Delta_n(\V_{p_t},x_t)} \min_{q \in \T^\rho} f(q)  \geq \min_{q \in (\T^*)^\rho} f(q) \geq R \geq \min_{\hy,\sc}Q_t(\hy,\sc).
+\]
+We now upper bound the LHS.
 \begin{align*}
-??&\leq \sup_{\T\in\Delta_n(\V_{p_t},x_t)} ~\min_{\hat{y},\bar{c}}\min_{q'\in\T^\rho} f((x_t,\hy,\sc);q')\\
-  &= \sup_{\T\in\Delta_n(\V_{p_t},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_{t}) + \mi(h,q))
+&\sup_{\T \in \Delta_n(\V_{p_t},x_t)} \min_{q \in \T^\rho} f(q) = \sup_{\T\in\Delta_n(\V_{p_t},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_{t}) + \mi(h,q))
   \\
-  &= \sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}_{t-1}])
+  &\quad= \sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})},x_t)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy_{t-1})}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hy_{t-1}])
   \\
-  &\leq \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}_{t-1}])
+  &\quad\leq \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy_{t-1}, \sc_{t-1}, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hy_{t-1}])
 \\   
-  &=\min_{\hat{y},\bar{c}}\max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hat{y}]) \\
-  &= \min_{\hat{y},\bar{c}}Q_{t-1}(\hat{y},\bar{c}).
+  &\quad=\min_{\hy,\sc}\max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hy]) \\
+  &\quad= \min_{\hy,\sc}Q_{t-1}(\hy,\sc).
 \end{align*}
-}
+We conclude that $\min_{\hy,\sc}Q_{t}(\hy,\sc) \leq \min_{\hy,\sc}Q_{t-1}(\hy,\sc)$. Now consider $Q_1$. By definition, $\mi(h, p_t) = 0$ since $p_1$ includes no predictions, and 
+similarly to the above,
+\[
+\min_{\hy,\sc}Q_1(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_1,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_1,\hy, \sc, \vy)}\cap \H_q} (\mi(h,q) +\indct[h(x_t) \neq \hy]).
+\]
+Since $\V_{p_1} = \V$, we get
+\begin{align*}
+\min_{\hy,\sc}Q_1(\hy, \sc) &\leq \sup_{\T\in\Delta_n(\V_{p_1},x_1)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_1}\cap \H_q} (\mi(h, p_{1}) + \mi(h,q)) \\
+&= \sup_{\T\in\Delta_n(\V,x_1)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_q} (\mi(h,q)) \leq \dldim(\V, n).
+\end{align*}
+The latter follows from the definition of $\dldim(\V, n)$.
+Lastly, to upper bound the total number of mistakes of the SOA run, note that at any round $t$,
+\begin{align*}
+&\max_{h\in \H_{(p_t,\hy, \sc, \vy)}} (\mi(h, p_t)) \leq 
+\min_{\hy,\sc} \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q)+\indct[h(x_t) = \hy]) \\
+&\quad= \min_{\hy,\sc}Q_{t+1}(\hy, \sc) \leq \dldim(\V, n).
+\end{align*}
+The first inequality follows by the realizability assumption, which implies that there is at least one $q$ with a non-empty $\H_q$. 
 \end{proof}
 
 
