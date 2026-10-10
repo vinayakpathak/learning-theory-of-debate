@@ -19,9 +19,9 @@ The Overleaf remote branch is `main`. This setup uses direct Overleaf Git
 access, not Overleaf's GitHub synchronization feature. The local repository
 connects the remotes; they do not synchronize automatically.
 
-**Keep `.gitignore`, `AGENTS.md`, and the entire `notes/` folder on local/GitHub
-`main`, but exclude them from the active Overleaf project. Never push local
-`main` directly to Overleaf.** The two branch tips intentionally differ in
+**Keep `.gitignore`, `AGENTS.md`, `CLAUDE.md`, and the entire `notes/` folder
+on local/GitHub `main`, but exclude them from the active Overleaf project.
+Never push local `main` directly to Overleaf.** The two branch tips intentionally differ in
 these paths. Notes must remain tracked and committed to GitHub; do not add
 `notes/` to `.gitignore`. Git ignore rules cannot filter tracked files out of
 a push.
@@ -66,7 +66,7 @@ away either side to make their intentionally different trees match.
 2. On clean local `main`, run
    `git merge --no-ff --no-commit overleaf/main`.
 3. If a merge starts, keep the local metadata and notes with
-   `git restore --source=HEAD --staged --worktree -- .gitignore AGENTS.md notes`.
+   `git restore --source=HEAD --staged --worktree -- .gitignore AGENTS.md CLAUDE.md notes`.
    Before restoring, inspect incoming changes to `notes/`; ask the user about
    any edits beyond the expected deletions from the filtered export. This
    restore also resolves conflicts confined to the excluded metadata or
@@ -81,8 +81,8 @@ removing the local metadata or notes before they can be restored.
 ## Publishing manuscript changes
 
 Before starting an export merge, compare the source trees excluding
-`.gitignore`, `AGENTS.md`, and `notes/`. If there are no manuscript changes to
-publish and all excluded paths are already absent on Overleaf, skip the
+`.gitignore`, `AGENTS.md`, `CLAUDE.md`, and `notes/`. If there are no manuscript
+changes to publish and all excluded paths are already absent on Overleaf, skip the
 export and push any requested `main` updates to GitHub. Notes-only changes
 must still be committed and pushed to GitHub.
 
@@ -94,10 +94,10 @@ must still be committed and pushed to GitHub.
 3. In that worktree, merge reconciled `main` using
    `git merge --no-ff --no-commit main`. Ask the user about manuscript conflicts
    before resolving them. Before committing, remove the excluded paths with
-   `git rm -r -f --ignore-unmatch -- .gitignore AGENTS.md notes`.
+   `git rm -r -f --ignore-unmatch -- .gitignore AGENTS.md CLAUDE.md notes`.
 4. Review the staged result and commit the export merge. The source files
    outside the excluded paths should match reconciled `main`; none of
-   `.gitignore`, `AGENTS.md`, or `notes/` may be in the export tree. Finish or
+   `.gitignore`, `AGENTS.md`, `CLAUDE.md`, or `notes/` may be in the export tree. Finish or
    abort any started merge before removing its worktree.
 5. Push with `git push overleaf overleaf-sync:main`, then
    `git push origin main`. Remove the clean temporary worktree when finished.
@@ -105,8 +105,8 @@ must still be committed and pushed to GitHub.
    before retrying. Never use force. Report which remotes were updated.
 
 The local `.git/hooks/pre-push` guard rejects pushes to this Overleaf project
-if the pushed tree contains `.gitignore`, `AGENTS.md`, or anything under
-`notes/`. It does not affect GitHub pushes. This guard and the default push
+if the pushed tree contains `.gitignore`, `AGENTS.md`, `CLAUDE.md`, or anything
+under `notes/`. It does not affect GitHub pushes. This guard and the default push
 mapping are machine-local; do not bypass the guard to publish an unfiltered
 branch.
 
@@ -233,6 +233,12 @@ or terminology for the debate model.
   Define hypotheses directly through their coefficients when a separate
   parameter space serves no purpose. Prefer the notation or coordinates of
   a construction to repeated technical adjectives.
+- Define a class of verifiers, hypotheses, or other objects by writing out
+  its members, for example as a parameterized family $\{v_{b,e}\}$, so that
+  it is clear exactly which objects it contains. A defining property with an
+  existential parameter can hide whether every parameter value occurs. Keep
+  an intuitive description, such as viewing a verifier at $x$ as a table,
+  beside the formal definition.
 - State the dimensions of parameterized matrices and vectors, distinguishing
   fixed dimensions from the dependence of entries on the parameter. Say
   "a matrix with rational entries" or "a vector with rational coordinates",
@@ -273,6 +279,10 @@ or terminology for the debate model.
   a numerical bound that follows only from a later parameter choice; derive
   it in the proof. State intermediate results in the form needed by the
   current algorithm, deferring extra generality for later algorithms.
+- In conditional probabilities, condition on explicit events such as
+  $h^*=h_a$ for a fixed value $a$, not on a bare random variable such as
+  "$\mid b$". Do not reuse the name of a random quantity for the fixed value
+  it is conditioned to take.
 - State reusable concentration bounds as lemmas with the probability and
   scope of the event in the statement and a separate proof. Carry probability
   qualifications into derived statements and use the same event throughout
