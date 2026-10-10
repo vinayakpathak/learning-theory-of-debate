@@ -91,7 +91,7 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 
 % \tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
 
-\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, $h^*$ can be anything, but we assume that it differs from the unique $h$ corresponing to $v^*$ at at most $k$ rounds. We call these \emph{misspecifications} and the corresponding rounds \emph{misspecified rounds}.} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
+\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, $v^*$ still validates $h^*$, but its output gets corrupted during $k$ of the rounds. We call these rounds \emph{misspecified}} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
 
 \paragraph{The debate protocol}
 
@@ -105,7 +105,8 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
   \item Debater \dt brings argument $\ct^i_t$ (in support of label $\hy_t$)
   \item Debater \df brings argument $\cf^i_t$ (aiming to falsify label $\hy_t$)
  \end{itemize}
- \item The verifier $v^*$ reveals $\vy_t = v(x, \ct^1_t, \cf^1_t, \ct^2_t, \cf^2_t, \ldots,  \ct^n_t, \cf^n_t)$\\
+Let $\sc_t=(\ct^1_t,\cf^1_t,\ldots,\ct^n_t,\cf^n_t)$.
+ \item ~\vinayak{The environment adversarially decides whether round $t$ is misspecified.  The debaters receive $\vy_t=v^*(x_t,\sc_t)$ if the round is not misspecified and $\vy_t=1-v^*(x_t,\sc_t)$ if it is. They are not told whether the round is misspecified.}\\
        The environment records (but does not reveal) $\ty_t = h^*(x_t)$ \ruth{Should this be here? Or does it look like the environment is committing to more than we intend? Should we rather let the environment explicitly choose the labels $y^*$ only after the $T$ rounds of debate? But what would this mean if $T$ is infinite? I'll keep the statements that the true labels are recoded here, but please comment on what you think is the right formaliztion}~\vinayak{I'm not sure it matters, since we want to prove our bounds for the worst-case environment. A similar thing happens in standard binary classification, right? We can either say that nature picks an $h^*$ before the game begins, and then ask that our algorithm gets a finite mistake against all nature choices, or we can say that nature picks a $y$ at each time step as long as the version space remains non-empty. Both lead to the same bounds?}
        \ruth{In the usual case, the environment commits to the labels anyways, since the labels are actually given as feedback to the learner in each round. Here the learner only gets the verifier feedback, that is not yet full information on the labels $y^*$... In our analysis we allow the environment to choose any sequence of true labels that is consistent with the verifier observations, so it does seem different.
        
@@ -130,7 +131,7 @@ For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier
 \ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
 \vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
 
-\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Thus we define \emph{debate regret} as $\Re(T) = \Mi(T) - k$, and \dt's regret as $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
+\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
 
 The number of rounds may be finite ($T\in\naturals$) or infinite ($T = \infty$).
 We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater \dt is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater \df on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater \df, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
@@ -139,26 +140,17 @@ The value of the overall debate that the two debaters produce is measured by ass
 
 \vinayak{
 \begin{claim}
-  $\Re(T) \leq \Re_T(T) + \Re_F(T) + k$.
+  $\Re(T) \leq \Re_T(T) + \Re_F(T) + 2k$.
 \end{claim}
 \begin{proof}
-Let $u$ be the number of unachievable rounds that are not misspecified. By definition, there cannot be any mistakes on these $u$ rounds. Thus
+Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
 \[
 \Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
 \]
-Subtracting $k$ from both sides and using the definitions of $\Re(T)$ and $\Re_T(T)$ gives
-\[
-\Re(T) \leq \Re_T(T)+\fLo(T)-u.
-\]
-But
-\begin{align*}
-\fLo(T)-u
-&= \Re_F(T)+\#\text{misspecified rounds}\\
-&\leq \Re_F(T)+k.
-\end{align*}
-Substituting, we get $\Re(T) \leq \Re_T(T)+\Re_F(T)+k$.
+By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
 \end{proof}
 }
+
 We will study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation. We will distinguish between the \emph{cooperative case} and the \emph{combative case}. In the cooperative case both debaters are acting cooperatively so as to minimize the debate evaluation measures. We can think of this as a scenario where debater \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions having taking into account relevant potential counter-arguments. In contrast, in the combative case, both debaters are acting in a way to minimize their own evaluation measures respectively. Thus in this case, even debater true may put up hypothesized labels $\hy_t$ that it knows it can argue for even through it is already aware the this does not correspond to the underlying truth $y^*_t$. We study whether the true underlying hypotheses can be recovered in both scenarios.
 
 \vinayak{I'm not sure that I like the names ``cooperative'' and ``combative''. The point of studying the cooperative version was to understand the best way to use access to this kind of verifiers. The ``debate'' thesis is that the best way to use such a verifier is to set up two debaters and let them argue against each other. But we don't think that should be the case. So the question is, if we don't restrict ourselves to set up these debaters and simply understand the best way to use these verifiers, what's the best that can be done? So ``cooperative'' is really just more general and ``combative'' is more restrictive. This should be reflected in the names somehow.}
@@ -305,6 +297,10 @@ Formally, we will consider the $k$-nonrealizable case, i.e., situations in which
 \section{A separation between cooperative and combative learning}
 \label{sec:cooperative-example}
 \input{cooperative-example}
+
+\section{A separation between agnostic and realizable learning}
+\label{sec:agnostic-example}
+\input{agnostic-example}
 
 % Authors are strongly encouraged to include an anonymous AI Disclosure section
 % if generative AI was used substantively. Uncomment and replace the example:

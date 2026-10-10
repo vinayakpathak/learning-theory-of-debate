@@ -1,0 +1,381 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={A Mistake Lower Bound for Agnostic Debate},
+  pdfsubject={A fixed-verifier lower bound under agnostic promise violations}}
+\usepackage{fancyhdr}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\True}{\mathsf{True}}
+\newcommand{\False}{\mathsf{False}}
+\DeclareMathOperator{\Bin}{Binomial}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\setlist[enumerate]{itemsep=3pt,topsep=5pt}
+\setlist[itemize]{itemsep=3pt,topsep=5pt}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Agnostic debate}
+\fancyhead[R]{\small A mistake lower bound}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\parskip}{3pt}
+\allowdisplaybreaks[1]
+
+\title{A Mistake Lower Bound for Agnostic Debate}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+\vspace{-2.2em}
+\begin{abstract}
+We give a distribution over fixed, deterministic verifiers with two hypotheses
+and two certificates. Every learning strategy makes exactly $T/2$ prediction
+mistakes in expectation, although the expected number of rounds on which the
+verifier violates its alignment promise is only $T/3$. The verifier is sampled
+once, before interaction; it does not randomize its responses. The obstruction
+is that only one verifier entry is observed at each fresh input, and corruptions
+make this observation independent of the true label. An appendix converts the
+construction to exactly $k$ violations, obtaining a lower bound of
+$\tfrac32 k-O(\sqrt{k\log(k+1)})$ for $T\ge 3k$.
+\end{abstract}
+
+\section{Protocol and the agnostic promise}
+
+Let $X$ be a domain, $Y=\{0,1\}$ the label set, $C$ a certificate set, and
+$H\subseteq Y^X$ a hypothesis class. A fixed but unknown verifier is a function
+\[
+    v:X\times C\times C\longrightarrow\{0,1\}.
+\]
+There is a target hypothesis $h^\star\in H$. At round $t$, an input $x_t$ is
+revealed, $\True$ chooses a prediction $y_t$ and a certificate $c_t^T$, and
+$\False$ chooses a certificate $c_t^F$. Both debaters then observe
+\[
+    o_t=v(x_t,c_t^T,c_t^F).
+\]
+The label $h^\star(x_t)$ is not revealed. The debaters' losses are
+$\ind\{o_t\ne y_t\}$ and $\ind\{o_t=y_t\}$, respectively, so observing these
+losses supplies no information beyond $(y_t,o_t)$. We count prediction mistakes:
+\[
+    M_T=\sum_{t=1}^T\ind\{y_t\ne h^\star(x_t)\}.
+\]
+
+The alignment promise at an input $x$ is that, for every $y\in\{0,1\}$,
+\begin{equation}\label{eq:promise}
+ h^\star(x)=y
+ \quad\Longleftrightarrow\quad
+ \exists c\in C\ \forall c'\in C:\ v(x,c,c')=y.
+\end{equation}
+A round is \emph{good} when this equivalence holds for both labels, and
+\emph{bad} otherwise. Let $K_T$ be the number of bad rounds.
+
+Here the agnostic model \emph{replaces} exact realizability by allowing
+violations of~\eqref{eq:promise}. The corrupted verifier need not belong to a
+class whose every member satisfies the original exact-realizability promise.
+
+Only the displayed verifier evaluation is available in each round: the
+debaters cannot query additional certificate pairs or other inputs. The lower
+bound allows arbitrary computation, randomization, and even full cooperation
+between the debaters. It therefore also applies to the sequential protocol
+with competing debaters.
+
+\section{A distribution over fixed verifiers}\label{sec:construction}
+
+Take
+\[
+    X=\N,\qquad C=\{0,1\},\qquad H=\{h_0,h_1\},
+    \qquad h_b(x)=b.
+\]
+The input sequence is $x_t=t$, so every round uses a fresh input. Represent
+$v$ at input $x$ by the matrix
+\[
+    A_x[c,c']=v(x,c,c'),\qquad c,c'\in\{0,1\}.
+\]
+The two debaters jointly select one of its four entries.
+
+\paragraph{Sampling the instance.}
+Before the game begins, sample $b$ uniformly from $\{0,1\}$ and set
+$h^\star=h_b$. Independently for each $x\in\{1,\ldots,T\}$, sample
+\[
+ B_x\sim\operatorname{Bernoulli}(1/3),
+ \qquad J_x\sim\operatorname{Uniform}(C\times C),
+\]
+independently of $b$. Define
+\begin{equation}\label{eq:matrix-rule}
+ A_x[c,c'] =
+ \begin{cases}
+     1-b, & B_x=1,\\
+     1-b, & B_x=0\text{ and }(c,c')=J_x,\\
+     b,   & B_x=0\text{ and }(c,c')\ne J_x.
+ \end{cases}
+\end{equation}
+For unused inputs $x>T$, set every matrix entry equal to $b$.
+
+If $B_x=0$, the matrix has three entries equal to $b$ and one exceptional
+entry equal to $1-b$. There is an all-$b$ row, but no all-$(1-b)$ row.
+Consequently, the full equivalence~\eqref{eq:promise} holds.
+
+If $B_x=1$, every entry equals $1-b$. There is no certificate forcing $b$,
+and every row forces $1-b$. Thus~\eqref{eq:promise} fails. For example, when
+$b=1$, one possible good matrix and the bad matrix are
+\[
+ \underbrace{\begin{pmatrix}1&1\\1&0\end{pmatrix}}_{\text{good}}
+ \qquad\text{and}\qquad
+ \underbrace{\begin{pmatrix}0&0\\0&0\end{pmatrix}}_{\text{bad}}.
+\]
+
+\paragraph{Why the verifier is fixed.}
+All variables $b,(B_x)_x,(J_x)_x$ are sampled before interaction. Once sampled,
+every $A_x$ is frozen and
+\[
+                    v(x,c,c')=A_x[c,c']
+\]
+is a deterministic function. Repeating the same query would return the same
+answer. The random experiment chooses the \emph{instance}; it does not
+resample the verifier when a query arrives.
+
+Because the inputs are distinct, a newly revealed input has never been queried.
+Under the distribution over instances, its hidden matrix is therefore still
+independent of the past conditional on $b$.
+
+\clearpage
+\section{The expected mistake lower bound}
+
+\begin{theorem}\label{thm:random-budget}
+For the distribution in Section~\ref{sec:construction}, every learning strategy
+satisfies
+\begin{equation}\label{eq:main}
+ \E[M_T]=\frac{T}{2},\qquad
+ K_T\sim\Bin(T,1/3),\qquad
+ \E[K_T]=\frac{T}{3}.
+\end{equation}
+In particular,
+\[
+                  \boxed{\E[M_T-K_T]=\frac{T}{6}.}
+\]
+Expectations include both the sampled instance and any randomness in the
+learning strategy.
+\end{theorem}
+
+\begin{proof}
+Let $R$ contain all random bits used by the debaters, sampled independently of
+the instance. Let $\mathcal H_{t-1}$ denote the entire transcript before
+round $t$. Conditional on $R$ and $\mathcal H_{t-1}$, all current actions are
+fixed, including the chosen entry $(c_t^T,c_t^F)$.
+
+Fix either value of $b$. Since the current input is fresh, $(B_t,J_t)$ is
+independent of $(R,\mathcal H_{t-1})$ conditional on $b$. On a good round,
+every selected entry equals $b$ with probability $3/4$; on a bad round,
+it never equals $b$. Therefore, for any current actions,
+\begin{align}
+ &\Pr\bigl(o_t=b\mid b,R,\mathcal H_{t-1},y_t,c_t^T,c_t^F\bigr)
+ \nonumber\\
+ &\hspace{2em}=
+ \underbrace{\frac23\cdot\frac34}_{\text{good round}}
+ +
+ \underbrace{\frac13\cdot0}_{\text{bad round}}
+ =\frac12.\label{eq:fair}
+\end{align}
+This is true for every certificate pair, not only uniformly sampled pairs.
+It follows that the conditional distribution of $o_t$ is a fair bit under
+both $b=0$ and $b=1$.
+
+Initially, $b$ is uniform and independent of $R$. Inductively, if
+$(R,\mathcal H_{t-1})$ has the same distribution under the two values of $b$,
+then the current actions also have the same distribution, and
+\eqref{eq:fair} gives the same distribution for the new feedback. Thus the
+whole observed transcript is independent of $b$ at every time. In particular,
+\[
+ \Pr(b=0\mid R,\mathcal H_{t-1})
+ =\Pr(b=1\mid R,\mathcal H_{t-1})=\frac12.
+\]
+The prediction $y_t$ is a function of $(R,\mathcal H_{t-1},x_t)$, with
+$x_t=t$ deterministic, so
+\[
+                     \Pr(y_t\ne b)=\frac12.
+\]
+Summing over rounds gives $\E[M_T]=T/2$.
+
+Finally, round $t$ is bad exactly when $B_t=1$. Hence
+$K_T=\sum_{t=1}^T B_t\sim\Bin(T,1/3)$ and $\E[K_T]=T/3$.
+\end{proof}
+
+\paragraph{The role of corruption.}
+Without bad matrices, a query is biased toward the true label: it returns
+$b$ with probability $3/4$ under this sampling scheme. Bad matrices always
+return $1-b$. A bad-round probability of $1/3$ exactly cancels the bias.
+The debaters see the resulting fair bit, but not whether it came from a good
+or bad matrix. Thus the fraction of good rounds is $2/3$ in expectation,
+yet the observations provide no information about the true hypothesis.
+
+\clearpage
+\section{What follows from the construction}
+
+\paragraph{A fixed hard instance exists.}
+For a fixed strategy, write $\E_R[M_T(b,v)]$ for its expected mistakes on
+one fixed target--verifier pair. The theorem gives
+\[
+ \E_{b,v}\!\left[\E_R[M_T(b,v)]-K_T(b,v)\right]=\frac{T}{6}.
+\]
+Therefore, for every strategy, there is a fixed pair $(b,v)$ such that
+\begin{equation}\label{eq:fixed-excess}
+           \E_R[M_T(b,v)]-K_T(b,v)\ge\frac{T}{6}.
+\end{equation}
+On that instance, only the strategy remains random. The order of quantifiers
+is ``for every strategy, there exists a fixed hard instance.''
+
+The basic construction has a \emph{random} corruption count; it does not say
+that this particular fixed instance has exactly $T/3$ bad rounds.
+Appendix~\ref{sec:exact} supplies an exact-budget version.
+
+\paragraph{No uniform $K_T+o(T)$ guarantee.}
+Suppose a strategy satisfied, for every admissible fixed instance,
+\[
+            \E_R[M_T(b,v)]\le K_T(b,v)+r(T).
+\]
+Averaging over our instance distribution would imply
+$T/2\le T/3+r(T)$, so necessarily $r(T)\ge T/6$. In particular, a
+uniform guarantee with $r(T)=o(T)$ is impossible in this agnostic model.
+
+\paragraph{What the benchmark measures.}
+Each matrix in the construction certifies exactly one label: $b$ on good
+rounds and $1-b$ on bad rounds. Following that certified label would make
+exactly $K_T$ prediction mistakes. This is the corruption benchmark used
+above. It is \emph{not} the hindsight prediction error of the best hypothesis
+in $H$: the target $h_b$ itself has zero prediction error.
+
+\paragraph{The clean prediction problem is easy.}
+Let $V_0$ contain verifiers for which, for some fixed $b$, every matrix is
+either all $b$ or has three $b$ entries and one $1-b$ entry. These verifiers
+satisfy~\eqref{eq:promise} everywhere. The corrupted instances above differ
+from a member of $V_0$ on only $K_T$ of the displayed inputs: replace each bad
+matrix by the all-$b$ matrix.
+
+For a fixed clean verifier and the same input sequence, choose both
+certificates uniformly and independently, and predict the majority of past
+feedback bits. Each query returns $b$ with probability at least $3/4$,
+independently across rounds. After $s$ observations, the probability of a
+wrong majority is at most $e^{-s/8}$ by the bounded-sum estimate proved below.
+Consequently,
+\[
+ \E[M_T]\le\sum_{s=0}^{T-1}e^{-s/8}
+          \le\frac{1}{1-e^{-1/8}}<9.
+\]
+Thus the lower bound is not simply due to an unlearnable clean
+\emph{prediction} problem. This clean prediction result does not assert that
+the debaters' optimal certificate policies are learnable with small regret;
+no such regret assumption is used in the lower bound.
+
+\clearpage
+\appendix
+\section{Exactly \texorpdfstring{$k$}{k} bad rounds}\label{sec:exact}
+
+\begin{corollary}\label{cor:exact}
+For every sufficiently large integer $k$ and every $T\ge 3k$, every strategy
+has a fixed target--verifier instance with exactly $k$ bad rounds on which
+\[
+       \boxed{\E_R[M_T]\ge
+       \frac32 k-O\!\left(\sqrt{k\log(k+1)}\right).}
+\]
+Moreover, $k$ is the minimum number of promise violations over $h\in H$ on
+this instance.
+\end{corollary}
+
+\begin{proof}
+All logarithms below are natural. Set
+\[
+ r=\left\lceil\sqrt{27k\log(k+1)}\right\rceil,
+ \qquad n=3k-r,
+\]
+so $n>0$ for sufficiently large $k$. First generate a prefix of $n$ rounds
+using Section~\ref{sec:construction}. Its bad-round count has distribution
+$K_n\sim\Bin(n,1/3)$ and mean $k-r/3$. Condition the instance sampling on
+\[
+                        E=\{k-r\le K_n\le k\}.
+\]
+Writing $\delta=\Pr(E^c)$, the bounded-sum estimate below gives
+\begin{align*}
+ \delta
+ &\le \exp\!\left(-\frac{2(r/3)^2}{n}\right)
+       +\exp\!\left(-\frac{2(2r/3)^2}{n}\right)\\
+ &\le 2\exp\!\left(-\frac{2r^2}{27k}\right)
+ \le \frac{2}{(k+1)^2}.
+\end{align*}
+Conditional on $E$, fill the next $r$ inputs with exactly $k-K_n$ bad
+all-$(1-b)$ matrices and make the remaining matrices all $b$. This is possible
+because $0\le k-K_n\le r$. For all inputs after $3k$, use the all-$b$ matrix.
+Every sampled instance now has exactly $k$ bad rounds among the first $T$.
+The entire construction, including the conditioning and completion, takes
+place before interaction.
+
+Fix any strategy, including one that knows $k$ and $T$. Run the same policy
+on the auxiliary \emph{unconditioned} prefix distribution. Theorem~
+\ref{thm:random-budget} gives $\E[M_n]=n/2$. For any random variable
+$Z\in[0,n]$, conditioning on an event of probability $1-\delta$ gives
+\[
+ \E[Z\mid E]-\E[Z]
+   =\delta\bigl(\E[Z\mid E]-\E[Z\mid E^c]\bigr)
+   \ge -n\delta.
+\]
+Therefore the conditioned construction satisfies
+\begin{align*}
+ \E[M_T]
+ &\ge \E[M_n\mid E]
+ \ge \frac n2-n\delta\\
+ &\ge \frac32k-\frac r2-\frac{6k}{(k+1)^2}
+ =\frac32k-O\!\left(\sqrt{k\log(k+1)}\right).
+\end{align*}
+Averaging now yields a fixed instance with at least this expected mistake
+count. Relative to $h_b$, that instance has $k$ violations; relative to
+$h_{1-b}$, it has $T-k$ violations. Since $T\ge 3k$,
+\[
+                  \min_{h\in H}K_T(v,h)=k.
+\]
+\end{proof}
+
+For $T=3k$, the corollary reads
+\[
+            \E_R[M_T]\ge \frac T2-o(T)
+            =k+\frac T6-o(T).
+\]
+For $T>3k$, the additional clean rounds cannot undo mistakes made in the hard
+prefix. Thus the same construction also excludes a uniform $k+o(k)$ bound as
+$k\to\infty$, even when $T/k\to\infty$.
+
+\clearpage
+\section{A concentration estimate}
+For completeness, if $Z_1,\ldots,Z_n$ are independent random variables in
+$[0,1]$, then for every $a\ge0$,
+\[
+ \Pr\!\left(\sum_{i=1}^n(Z_i-\E Z_i)\ge a\right)
+       \le e^{-2a^2/n},
+\]
+with the same bound for the lower tail. To see this, for one such variable
+let $f(\lambda)=\log\E[e^{\lambda(Z-\E Z)}]$. Its second derivative is the
+variance of $Z$ under an exponentially tilted distribution and is at most
+$1/4$, because $Z\in[0,1]$. Since $f(0)=f'(0)=0$, this gives
+$f(\lambda)\le\lambda^2/8$. Independence and the exponential Markov bound
+then give
+\[
+ \Pr\!\left(\sum_{i=1}^n(Z_i-\E Z_i)\ge a\right)
+ \le\inf_{\lambda\ge0}e^{-\lambda a+n\lambda^2/8}
+ =e^{-2a^2/n}.
+\]
+Applying the same argument to $1-Z_1,\ldots,1-Z_n$ gives the lower tail.
+
+\end{document}
