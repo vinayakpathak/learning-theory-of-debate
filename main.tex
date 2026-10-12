@@ -404,9 +404,8 @@ Let $\T$ be a debate tree and let $\alpha$ be a node in $\T$. Then
 
 \begin{itemize}
     \item kd lower bound  - Tosca
-    \item kd upper bound - Sivan?
     \item Lemma 6 - show that infinite certificate class doesn't work - Tosca?
-    \item oppositional case dimensions - Sivan, working on it
+    \item oppositional case dimensions - Sivan, working on it, regret vs loss issue
     \item oppositional case agnostic - ??
     \item is online learning always easier? - Tosca?
 \end{itemize}
@@ -423,7 +422,7 @@ $\tRe(T) = \tLo(T)$.
 For \df, even given $v^*$, there could be rounds where a loss is inevitable, because \dt selected arguments that cannot be refuted. 
 We call such rounds \emph{unachievable} for \dt. Let $U(T)$ be the number of unachievable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. 
 
-The following result shows that the total regret of the debaters upper bounds the total mistakes of the debate protocol. This motivates the oppositional setting: If each debater selfishly succeeds to obtain a lower regret, it also reduces the prediction error of the protocol.\footnote{\sivan{Note in particular, that if \df wants to minimize its regret, it can do so by helping \dt identify the true $v^*$, since this would lead to $U(T) = T$ and $\fRe(T) = 0$. However, this may require \df to make assumptions on the behavior of \dt and not treat its input as fully adversarial.}}
+The following result shows that the total regret of the debaters upper bounds the total mistakes of the debate protocol. This motivates the oppositional setting: If each debater selfishly succeeds to obtain a lower regret, it also reduces the prediction error of the protocol.\footnote{\sivan{(not sure yet about this comment, related to regret vs loss issue) Note in particular, that if \df wants to minimize its regret, it can do so by helping \dt identify the true $v^*$, since this would lead to $U(T) = T$ and $\fRe(T) = 0$. However, this may require \df to make assumptions on the behavior of \dt and not treat its input as fully adversarial.}}
 
 
 
@@ -469,42 +468,15 @@ Moreover, each edge starting at a node $(\vy,x,\hy, \ct)$ ends in a node with $\
 
 \sivan{TODO: define the depth with respect to the loss only, since this is what this debater optimizes. The dimension $\cfd(\V)$ is defined as the maximum depth of a tree of this type. }
 
-\section{\sivan{todo unrealizable case}}
+\section{Non-realizability with cooperative debaters}
 
 In the $k$-non-realizable setting for $k \in \naturals$, we consider the same debate protocol as described above, except that in at most $k$ rounds, the environment may provide $\vy \neq v^*(x_t, \sc_t)$.
-\sivan{perhaps the oppositional should be later}
-In this case, in the oppositional setting we extend the regret to account for misspecified rounds. For \dt, we define $\Re_\ct(T) = \tLo(T) - k$, where $k$ is the minimal value such that the sequence is $k$-non-realizable. For \df, we define 
-$\Re_\cf(T) = \fLo(T) - k - k'$, where $k$ is the minimal value such that the sequence is $k$-non-realizable and $k'$ is the number of realizable rounds that are unachievable. 
+\sivan{more text missing here}
+\subsection{An upper bound (cooperative) \sivan{temporary title; done, please review}}
 
-\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
-
-and the \emph{debate regret}
-quad\vinayak{\text{define regret in comparison to optimal debaters(?)}}
-unachievable rounds
-\dt is evaluated through its \emph{loss} and its \emph{regret}
-\begin{align*}
- \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \tLo(T) - \#\text{misspecified rounds}
-\end{align*}
-
-\vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
-
-
-\vinayak{
-\begin{claim}
-  $\Re(T) \leq \Re_\ct(T) + \Re_\cf(T) + 2k$.
-\end{claim}
-\begin{proof}
-Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
-\[
-\Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
-\]
-By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
-\end{proof}
-}
-
-\subsection{An upper bound (cooperative) \sivan{todo}}
-
-\sivan{references? did chat build on something? also cite upper bound of DFF and why it doesn't work here}
+In this section, we provide upper bound of $O(kd)$, matching the lower bound \todo{reference when lower bound is done}.
+\cite{oz2026discriminative} provides a general deterministic strategy obtaining such an upper bound for interactive learning protocols. However, that strategy relies on the learner having access to its incurred loss, which is not available in debate learning. 
+Our upper bound employs instead a simple randomized algorithm based on majority voting, whose structure is inspired by the Private Online Procedure of \cite{kaplan2023black}. 
 \begin{theorem}
     Assume the $k$-non-realizable setting. For any verifier class $\V$ with $\dldim(\V) = d \in \naturals$, there is a randomized learning strategy for cooperative debaters that incurs at most $16kd$ mistakes in expectation. 
 \end{theorem}
@@ -518,26 +490,24 @@ The strategy works as follows:
         \item Set $\sc_t$ to the certificate $\sc$ suggested by one of the copies $i_t$, where $i_t$ selected uniformly at random from $[4k]$. Get $\vy_t$ and feed it to the same copy.
     \end{itemize}
 \end{itemize}
-Call a copy ``uncorrupted at time $t$'' if it has not been provided with a corrupted feedback until round $t$. Since There can be at most $k$ misspecified rounds, at least $3k$ copies are uncorrupted at each time $t$. 
-
-For round $t$, let $M_t = \indct[\hy_t \neq y_t]$. Let $\hy_t^i$ be the label proposed by copy $i$ at round $t$, and define $Z_t = \indct[\hy_t^{i_t} \neq y_t \wedge i_t \text{ is uncorrupted at time }$t$]$. Any copy $i_t$ can make at most $d$ mistakes as long as it is uncorrupted. Hence, $\sum_t Z_t \leq 4kd$. On the other hand, if $M_t = 1$, then at least $2k$ copies $i$ have $\hy_t^{i} \neq y_t$ in round $t$, and at least $k$ of these are uncorrupted at time $t$. 
+Call a copy ``uncorrupted at time $t$'' if it has not been provided with a corrupted feedback until round $t$. Since there can be at most $k$ misspecified rounds, at least $3k$ copies are uncorrupted at each time $t$. For round $t$, let $M_t = \indct[\hy_t \neq y_t]$. Let $\hy_t^i$ be the label proposed by copy $i$ at round $t$, and define $Z_t = \indct[\hy_t^{i_t} \neq y_t \wedge i_t \text{ is uncorrupted at time }$t$]$. Any copy $i_t$ can make at most $d$ mistakes as long as it is uncorrupted. Hence, $\sum_t Z_t \leq 4kd$. On the other hand, if $M_t = 1$, then at least $2k$ copies $i$ have $\hy_t^{i} \neq y_t$ in round $t$, and at least $k$ of these are uncorrupted at time $t$. 
 Therefore, for any history $H_t$ of the run until round $t$, $\Pr(Z_t = 1 \mid M_t = 1, H_t) \geq 1/4$. 
 Thus,
 \[
-\ex[Z_t \mid H_t] \geq \ex[Z_t = 1 \mid M_t = 1, H_t]\cdot \ex[M_t = 1 \mid H_t] \geq \ex[M_t = 1 \mid H_t]/4.
+\ex[Z_t \mid H_t] \geq \Pr(Z_t = 1 \mid M_t = 1, H_t)\cdot \Pr(M_t = 1 \mid H_t) \geq \Pr(M_t = 1 \mid H_t)/4 = \ex[M_t \mid H_t]/4.
 \]
+Taking expectation over $H_t$, we get $\ex[Z_t] \geq \ex[M_t = 1]/4$.
 Therefore,
 \[
-4kd \geq \ex[\sum_t Z_t] = \sum_t \ex[Z_t \mid H_t]
+4kd \geq \ex[\sum_t Z_t] = \ex[\sum_t M_t]/4.
 \]
-
-
-, it implies $\ex[Z_t] \geq 1/4 \ex[M_t]$. But since $\sum Z_t \leq 4kd$, we get that $\sum_t \ex[M_t] \leq 16kd$.
+It follows that $\ex[\sum_t M_t] \leq 16kd$.
 \end{proof}
 
-\subsection{A lower bound (separation between unrealizable and realizable learning)}
+\subsection{Separation between unrealizable and realizable learning}
 \label{sec:agnostic-example}
 \input{agnostic-example}
+
 
 
 \subsection{A stronger lower bound \tosca{???}}
@@ -588,6 +558,41 @@ We will argue that independent of the learners behaviour, the resulting sequence
 \end{proof}
 \ruth{I don't understand the example.. can you explain the idea of the construction in words also? I suspect there are some typos in the four points with all the quantifiers, eg in the first point it says $\forall c_1, c_2 = 1$, in the third point, there should be a ``for all'' quantification for the $c_2$s? The last point doesn't seem to conclude.. But either way, I think it would be good to explain more.}
 
+\section{Unrealizable oppositional setting \todo{complete this}}
+
+In this case, in the oppositional setting we extend the regret to account for misspecified rounds. For \dt, we define $\Re_\ct(T) = \tLo(T) - k$, where $k$ is the minimal value such that the sequence is $k$-non-realizable. For \df, we define 
+$\Re_\cf(T) = \fLo(T) - k - k'$, where $k$ is the minimal value such that the sequence is $k$-non-realizable and $k'$ is the number of realizable rounds that are unachievable. 
+
+\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
+
+and the \emph{debate regret}
+quad\vinayak{\text{define regret in comparison to optimal debaters(?)}}
+unachievable rounds
+\dt is evaluated through its \emph{loss} and its \emph{regret}
+\begin{align*}
+ \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \tLo(T) - \#\text{misspecified rounds}
+\end{align*}
+
+\vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
+
+
+\vinayak{
+\begin{claim}
+  $\Re(T) \leq \Re_\ct(T) + \Re_\cf(T) + 2k$.
+\end{claim}
+\begin{proof}
+Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
+\[
+\Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
+\]
+By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
+\end{proof}
+}
+
+
+\sivan{I Think the agnostic separation example could work for opposing ones but need to think about it ... if an instance appears for the first time in this sequence, \dt proposes as a label the majority of the earlier feedback $\vy_1,\ldots,\vy_{t-1}$, and chooses its certificate/argument uniformly and independently. Otherwise, XXXXXXXXXXXXxx Since each table of $v^*$ has at most one entry equal to $1-b$,
+the probability that the response is $1-b$ is either $1/2$ }
+
 
 
 % Authors are strongly encouraged to include an anonymous AI Disclosure section
@@ -605,6 +610,8 @@ automatically hides this text.}
 \appendix
 
 % \crefalias{section}{appendix} % uncomment if you are using cleveref
+
+
 
 \section{Deferred proofs}
 
