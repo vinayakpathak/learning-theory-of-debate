@@ -1,0 +1,215 @@
+% Standalone note. From the repository root, compile with:
+% latexmk -pdf -outdir=.vscode/latex-build/notes notes/corruption_kd_lower_bound.tex
+% Copy the resulting PDF to notes/corruption_kd_lower_bound.pdf if desired.
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\hypersetup{pdftitle={A matching lower bound for corrupted verifier feedback}}
+
+\newcommand{\X}{\mathcal X}
+\newcommand{\C}{\mathcal C}
+\newcommand{\V}{\mathcal V}
+\newcommand{\E}{\mathbb E}
+\newcommand{\ind}{\mathbf 1}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\title{A matching lower bound for corrupted verifier feedback}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+We construct a verifier class whose optimal deterministic realizable mistake
+bound is exactly $d$, but for which at most $k$ corrupted responses can force
+every randomized cooperative learner to make at least $d(k+1)/4$ expected
+mistakes. The same class works for every $k$. The verifier is fixed before
+the interaction, while the corruption decisions may depend on the queried
+certificates.
+
+The idea is to hide one certificate value among $4d$ possibilities. Each
+query tests at most two of them. Without corruption, testing every value
+once determines the true label. With corruption, the first $k$ positive
+responses can be hidden. We show that many possible hidden values remain
+indistinguishable from a verifier whose output is always zero.
+
+\section{Protocol and verifier class}\label{sec:class}
+
+Fix an integer $d\ge1$. Let $\X=\{x_0\}$ and $\C=[4d]=\{1,\ldots,4d\}$.
+The input is $x_0$ on every round. We first consider debates of length one.
+A cooperative learner predicts a label $\hat y_t\in\{0,1\}$ and chooses
+certificates $p_t,q_t\in\C$. It then observes one verifier response
+$\tilde y_t$. The true label is not revealed separately, and no additional
+verifier queries are allowed. Both the prediction and the certificates may
+depend on the earlier interaction and the learner's private randomness.
+
+For a fixed verifier $v^*$, let $h_{v^*}$ denote its validated hypothesis.
+We count prediction mistakes by
+\[
+M(T)=\sum_{t=1}^T\ind\{\hat y_t\ne h_{v^*}(x_0)\}.
+\]
+A round is corrupted when $\tilde y_t\ne v^*(x_0,p_t,q_t)$. The number of
+corrupted rounds is at most $k$ on every run.
+
+For $b\in\{0,1\}$, let $h_b(x_0)=b$. Define the verifiers
+\[
+v_0(x_0,p,q)=0,
+\qquad
+v_j(x_0,p,q)=\ind\{p=j\text{ or }q=j\},\quad j\in[4d],
+\]
+and let $\V_d=\{v_0\}\cup\{v_j:j\in[4d]\}$.
+Think of each verifier as a $4d\times4d$ table, with the first certificate
+indexing its row and the second indexing its column. The table of $v_0$ is
+all zero. The table of $v_j$ is zero except that row $j$ and column $j$ are
+all one.
+
+These are valid verifiers. The verifier $v_0$ validates $h_0$. For $v_j$,
+the proposer can force output $1$ by choosing $p=j$. No choice of $p$ can
+force output $0$, because the responder can always choose $q=j$ and obtain
+output $1$. Thus every $v_j$ validates $h_1$, and the supported hypothesis
+class is precisely $\{h_0,h_1\}$.
+
+\section{The deterministic realizable mistake bound}\label{sec:clean}
+
+We can determine the true label by querying disjoint pairs until every
+certificate value has been tested. Alternating the predictions during this
+search limits the mistakes for either possible true label.
+
+\begin{lemma}\label{lem:clean}
+The optimal deterministic realizable mistake bound for $\V_d$ is exactly $d$.
+\end{lemma}
+\begin{proof}
+For the upper bound, query the pairs
+\[
+(1,2),(3,4),\ldots,(4d-1,4d),
+\]
+in this order, while alternating predictions $0,1,0,1,\ldots$. If a response
+is $1$, the verifier cannot be $v_0$, so predict $1$ on every later round.
+If all $2d$ responses are zero, the verifier must be $v_0$, so predict $0$
+on every later round.
+
+When the true label is $0$, all responses are zero and exactly $d$ of the
+first $2d$ predictions are wrong. When the true label is $1$, a positive
+response occurs within those $2d$ rounds. Only predictions of $0$ before
+or on that round can be wrong, and there are at most $d$ of them. Thus the
+learner makes at most $d$ mistakes for every horizon.
+
+For the lower bound, fix any deterministic learner and follow its first
+$2d-1$ rounds when every response is zero. Its queries use at most $4d-2$
+distinct certificate values, so there is an index $j\in[4d]$ that never
+appears. Both $v_0$ and $v_j$ give exactly this response sequence. Among the
+$2d-1$ predictions, one label appears at least $d$ times. If that label is
+$1$, choose $v^*=v_0$; if it is $0$, choose $v^*=v_j$. In either case, the
+learner makes at least $d$ mistakes. Since the learner is deterministic,
+this entire response sequence and the chosen verifier can be determined
+before the actual interaction.
+\end{proof}
+
+By the cooperative characterization in the manuscript, the debate
+Littlestone dimension of this class is therefore $d$.
+
+\section{The lower bound with corrupted feedback}\label{sec:corrupt}
+
+We now hide the first $k$ positive responses of a verifier $v_j$. As long as
+the learner has queried the hidden value $j$ at most $k$ times, all observed
+responses are zero. This is exactly what the learner would observe from
+$v_0$, whose true label is opposite. The following argument counts how many
+hidden values can still be concealed after a given number of queries.
+
+\begin{theorem}\label{thm:corrupt}
+For every integer $k\ge0$, every $T\ge d(k+1)$, and every randomized
+cooperative learner for $\V_d$, there is a fixed verifier $v^*\in\V_d$ and
+an adaptive corruption strategy using at most $k$ corruptions on every run
+such that $\E[M(T)]\ge d(k+1)/4$. The expectation is over the learner's
+randomness, and the verifier is chosen before that randomness is observed.
+\end{theorem}
+\begin{proof}
+Let $m=d(k+1)$. We first give a distribution over verifiers, chosen
+independently of the learner's random bits before interaction. Choose $v_0$
+with probability $1/2$. With the remaining probability $1/2$, choose an
+index $J$ uniformly from $[4d]$ and use $v_J$.
+
+Under $v_0$, leave every response unchanged. Under $v_j$ for $j\in[4d]$,
+replace its first $k$ responses equal to $1$ by $0$, and leave all other
+responses unchanged. Apply this rule only during the first $m$ rounds;
+afterward, leave every response unchanged. This strategy uses at most $k$
+corruptions on every run. It changes only the observed responses, not the
+fixed verifier or its validated hypothesis.
+
+Fix a realization $r$ of all the learner's random bits. Run the resulting
+deterministic policy hypothetically for $m$ rounds with all feedback equal
+to zero. Write $(p_t^{(r)},q_t^{(r)})$ for its certificate pair and
+$\hat y_t^{(r)}$ for its prediction on round $t$ of this hypothetical run.
+For each $j\in[4d]$, let
+\[
+N_j(r)=\sum_{t=1}^m
+\ind\{p_t^{(r)}=j\text{ or }q_t^{(r)}=j\}.
+\]
+This counts the rounds in which the query tests value $j$. Each round tests
+at most two distinct values, so $\sum_{j=1}^{4d}N_j(r)\le2m$.
+Consequently,
+\[
+\bigl|\{j:N_j(r)\ge k+1\}\bigr|
+\le\frac{2m}{k+1}=2d.
+\]
+Define $G(r)=\{j\in[4d]:N_j(r)\le k\}$. We have $|G(r)|\ge2d$.
+
+For every $j\in G(r)$, the actual corrupted interaction with $v_j$ follows
+the hypothetical all-zero run for all $m$ rounds. To see this, proceed
+inductively. As long as earlier feedback agrees, the learner chooses the
+same certificates as in the hypothetical run. A query not containing $j$
+has raw response zero. A query containing $j$ has raw response one, but it
+is among at most $k$ such queries in this run, so the corruption strategy
+changes it to zero. The transcripts therefore continue to agree.
+
+Let $a(r)=\sum_{t=1}^m\ind\{\hat y_t^{(r)}=1\}$, the number of predictions
+of $1$ on the hypothetical run. Also let $M_r(v;m)$ denote the actual
+mistake count in the first $m$ rounds with verifier $v$, random bits $r$,
+and the corruption strategy just defined. Under $v_0$, the true label is
+$0$ and $M_r(v_0;m)=a(r)$. For each $j\in G(r)$, the predictions are the
+same but the true label is $1$, so $M_r(v_j;m)=m-a(r)$.
+
+Averaging over the verifier distribution while keeping $r$ fixed gives
+\begin{align*}
+\frac12 M_r(v_0;m)+\frac{1}{8d}\sum_{j=1}^{4d}M_r(v_j;m)
+&\ge\frac12 a(r)+\frac{|G(r)|}{8d}\bigl(m-a(r)\bigr)\\
+&\ge\frac12 a(r)+\frac14\bigl(m-a(r)\bigr)\\
+&\ge\frac m4.
+\end{align*}
+This holds for every realization $r$. Averaging over the learner's random
+bits shows that the expected mistake count under our distribution of fixed
+verifiers is at least $m/4$. Hence at least one fixed verifier in its
+support has expected mistake count at least $m/4$, where this last
+expectation is over the learner's randomness alone. The corruption rule
+for that verifier is already fixed. Finally, $M(T)\ge M(m)$ because
+$T\ge m$, which proves the claim.
+\end{proof}
+
+The corruption budget in Theorem~\ref{thm:corrupt} holds on every run; it
+is not merely a bound on the expected number of corruptions. The verifier
+is chosen in advance, but the corrupted rounds depend on the learner's
+queries. The proof does not require a schedule of corrupted rounds chosen
+in advance.
+
+\section{Longer debates}\label{sec:longer}
+
+The same construction works for every debate length $n\ge1$. Given the
+verifiers in Section~\ref{sec:class}, define
+\[
+v_j^{(n)}(x_0,c_1,\ldots,c_{2n})=v_j(x_0,c_1,c_2),
+\qquad j\in\{0,1,\ldots,4d\},
+\]
+and let $\V_{d,n}=\{v_j^{(n)}:j\in\{0,1,\ldots,4d\}\}$. The later
+certificates do not affect the response. For $j\in[4d]$, choosing $c_1=j$ still forces
+output $1$ under $v_j^{(n)}$, and choosing $c_2=j$ still prevents the
+proposer from forcing output $0$. Thus the validated hypotheses are
+unchanged. Each round still tests at most two values and reveals just one
+bit, so Lemma~\ref{lem:clean} and Theorem~\ref{thm:corrupt} apply without
+changing either bound.
+
+\end{document}
