@@ -123,22 +123,22 @@ We first give the debate protocol for the realizable setting.
 Let $\sc_t=(\ct^1_t,\cf^1_t,\ldots,\ct^n_t,\cf^n_t)$.
  \item The debaters receive $\vy_t=v^*(x_t,\sc_t)$. 
  \item %~\vinayak{The environment adversarially decides whether round $t$ is misspecified.  The debaters receive $\vy_t=v^*(x_t,\sc_t)$ if the round is not misspecified and $\vy_t=1-v^*(x_t,\sc_t)$ if it is. They are not told whether the round is misspecified.}\\
-       The environment records (but does not reveal) $y_t = h^*(x_t)$ 
+       The environment records (but does not reveal) $\ty_t = h^*(x_t)$ 
 \end{enumerate}
 \end{itemize}
 
-A run of the debate protocol is evaluated through the \emph{number of mistakes} in predicting the label $y_t$. For a fixed interaction sequence, denote the number of mistakes by
+A run of the debate protocol is evaluated through the \emph{number of mistakes} in predicting the label $\ty_t$. For a fixed interaction sequence, denote the number of mistakes by
 \begin{align*}
  \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t].
 \end{align*}
 
-We can consider \dt and \df that can be cooperative, so as to minimize $\Mi(T)$. 
-In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity.
+We can consider \dt and \df that can be cooperative, with the joint goal to minimize $\Mi(T)$. 
+In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity \ruth{that we also sometimes refer to as \emph{the learner} in this case}.
 
 
 
 
-In contrast, a standard approach for using debates considers the two debaters as considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
+In contrast, a standard approach for using debate \ruth{as a learning strategy, }considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
 We formalize this by defining a loss\vinayak{are there previous works that formalize it this way? (sivan)}~\vinayak{yes this is the standard loss function used in the literature. Often it's somewhat more general because the verifier gives a score, which can be a fraction, that judges how well does the debate transcript prove that the true label of $x$ is $\hat{y}$}\sivan{In this case we need a reference} for each debater. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
 \begin{align*}
  \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].
@@ -164,7 +164,7 @@ We call this the \emph{oppositional setting}.
 
 \section{Cooperative debaters}
 \label{sec:cooperative-case}
-In this section, we start by exploring learning via debate using cooperative debaters. In this case we can call them together ``the learner''. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents potential runs of the debate protocol for debate length $n$.
+In this section, we start by exploring learning via debate using cooperative debaters. In this case we can call them jointly ``the learner''. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents potential runs of the debate protocol for debate length $n$.
 
 In our tree construction, edges correspond to all possible learner actions 
 and nodes correspond to worst-case actions of the environment. 
