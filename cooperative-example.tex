@@ -1,5 +1,9 @@
-Let $\X=\naturals$, $\Y=\{0,1\}$, $\C=\{0,1\}$, and $n=1$. For $b\in\{0,1\}$, let $h_b:\X\to\Y$ be the constant function $h_b(x)=b$ and let $\H=\{h_0,h_1\}.$
+Despite this result, the oppositional setting can still be unsuccessful even in a case that is very easy with cooperative debaters. This is shown in the following example. 
 
+
+
+\begin{example}\label{ex:coop}
+Let $\X=\naturals$, $\Y=\{0,1\}$, $\C=\{0,1\}$, and $n=1$.  $b\in\{0,1\}$, let $h_b:\X\to\Y$ be the constant function $h_b(x)=b$ and let $\H=\{h_0,h_1\}.$
 For every bit $b\in\{0,1\}$ and function $s:\naturals\to\{0,1\}$, define
 \[
 v_{b,s}(x,\ct,\cf)=
@@ -8,7 +12,29 @@ b, & \ct=s(x)\text{ or }\cf=1,\\
 1-b, & \text{otherwise}.
 \end{cases}
 \]
-And define the verifier class as $\V=\{v_{b,s}:b\in\{0,1\},\ s:\naturals\to\{0,1\}\}$. Thus verifier $v_{b,s}$ validates hypothesis $h_b$ with $\ct=s(x)$ being the winning certificate for the \dt on input $x$. If $s$ was known, then \dt would simply pick $\ct=s(x)$ once, and the verifier's output would reveal the true hypothesis no matter what certificate the \df picked. However, the issue is that $s$ needs to be learned. 
+For a given $x$, $v_{b,s}(x,\ct,\cf)$ can be illustrated as follows:
+\[
+\begin{array}{c|cc}
+ & \cf=0 & \cf=1\\
+\hline
+\ct=s(x) & b & b\\
+\ct\neq s(x) & 1-b & b
+\end{array}
+\]
+Define the verifier class as $\V=\{v_{b,s}:b\in\{0,1\},\ s:\naturals\to\{0,1\}\}$. Thus verifier $v_{b,s}$ validates hypothesis $h_b$, with $\ct=s(x)$ being the winning certificate for the \dt on input $x$. 
+\end{example}
+If $s$ was known, then \dt would simply pick $\ct=s(x)$ once, and the verifier's output would reveal the true hypothesis no matter what certificate the \df picked. However, the issue is that $s$ needs to be learned. The following theorem shows that this requires the debaters to cooperate.
 
-On the other hand, it is quite easy for the \df to figure out the ground truth. It just needs to pick $\cf=1$ once, and the verifier's output reveals the ground truth. Thus if they were playing cooperatively, the \df would pick $\cf=1$ at the first step, revealing the ground truth, and the \dt would pick the correct label after that. However, the \df is not incentivized to do this in the combative setting. 
+\begin{theorem}
+    For Example~\ref{ex:coop}, $\dldim(\V) = 1$, while an adversary can force oppositional debaters to incur at least $T/2$ mistakes.
+\end{theorem}
+\begin{proof}
+If \df selects $\cf=1$ in the first round, then and the verifier's output reveals the ground truth $b$. Thus, exactly one mistake can be enforced in the cooperative setting, hence $\dldim(\V) = 1$.
+
+On the other hand, in the oppositional setting, \df is not incentivized to do this in the oppositional setting: 
+Since its goal is to maximize the number of failed proposed labels $(\hy_t \neq \vy_t)$ against an adversarial input sequence, it will always select $\cf^1_t=0$. 
+Then, consider a sequence of instances $x_1,x_2,\ldots x_T = 1,2,\ldots, T$, and let $\ct^1_t$ be \dt's response in round $t$. Let $s$ be selected at random by the environment, such that in every round, $\ct^1_t \neq s(t)$ with probability $1/2$. Since \df selects $\cf^1_t = 0$, the true $b$ is revealed with probability $1/2$ in every round, thus it is impossible to identify it, regardless of the length of the sequence. The expected number of prediction mistakes is thus  $\ex[\Mi(T)] = T/2$, instead of at most one if the two debaters cooperate. \sivan{This is a bit shaky and will work better after we define the adversarial debaters acccurately}
+\end{proof}
+
+
 

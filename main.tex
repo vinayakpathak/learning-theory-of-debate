@@ -18,6 +18,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{times}
 \usepackage{bbm}
+\usepackage{bm}
 \usepackage[normalem]{ulem}
 
 % Use \Name{Author Name} to specify the name.
@@ -52,15 +53,20 @@
 \maketitle
 
 \begin{abstract}%
-  We initiate the formal study of learning via debate.%
+  We initiate the formal study of learning via debate. \sivan{missing text} %
 \end{abstract}
 
 \begin{keywords}%
-  Learning via debate, online learning, Littlestone tree
+  Learning via debate, online learning, interactive learning
 \end{keywords}
 
 \section{Introduction}
 \input{intro}
+
+\section{Related Work}
+
+\vinayak{works on theoretic debate learning, works on rich feedback/interactive learning protocols including DFF}
+\sivan{cite DFF where needed}
 
 \section{Formal Setup}
 % We let $\X$ denote a \emph{domain}, $\Y = \{0,1\}$ a binary \emph{label space}, and $\C = \{0,1\}$ a binary \emph{certificate space}.  
@@ -68,101 +74,106 @@ We let $\X$ denote a \emph{domain}, $\Y = \{0,1\}$ a binary \emph{label space}, 
 A \emph{hypothesis} is a function $h:\X\to\Y$, and we use $\H$ to denote a \emph{hypothesis class}.
 A \emph{debate of length} $n$ is a sequence $(\c_1, \c_2, \ldots, \c_{2n})$ of $2n$ certificates $c_i\in\C$. We think of these certificates as being produced alternately by two debaters. That is, we think of the certificates $c_i$ of odd index as being produced by the first debater, which we will call the \dt, and the certificates $c_i$ of even index by the second debater, which we will refer to as the \df. To clarify the role of the arguments in the debate, we usually will use the notation $(\ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n)$ for a debate of length $n$
 
-The debate is moderated through a \emph{verifier} $v: \X\times \C^{2n} \to \Y$ which takes in a domain point and a debate of length $n$ and produces a label for $x$ given the arguments in the debate. The following definition specifies the relationship between hypotheses and verifiers in our framework.
+The debate is moderated through a verifier, which takes in a domain point and a debate of length $n$ and produces a label for $x$ given the arguments in the debate. 
+The following definition specifies the relationship between hypotheses and verifiers in our framework.
 
 \begin{definition}
-Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \Y$ \emph{validates} hypothesis $h$ through debate of length $n$ if 
-% \begin{align*}
-% ~\forall~ x\in \X ~\exists~ \ct^1 \in \C ~\forall~ \cf^1 \in \C   ~\exists~ \ct^2 \in \C ~\forall~ & \cf^2 \in \C \ldots ~\exists~ \ct^n \in \C ~\forall~ \cf^n ~:~ \\
-% & v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = h(x)
-% \end{align*}
+Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \Y$ \emph{validates} hypothesis $h$ through debate of length $n$ if for all $x\in\X$ there exists a unique $y\in \Y$ such that
 \begin{align*}
-~\forall~ x\in \X ~\exists~ \ct^1 \in \C ~\forall~ \cf^1 \in \C &  ~\exists~ \ct^2 \in \C ~\forall~  \cf^2 \in \C \ldots ~\exists~ \ct^n \in \C ~\forall~ \cf^n \in \C ~:~ \\
-& v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = y \iff h(x) = y
+\exists\ct^1\in\C\,\forall\cf^1\in\C\,\exists\ct^2\in\C\,\forall \cf^2\in\C\ldots\,\exists\ct^n\in\C\,\forall\cf^n\in\C,
+v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = y,
 \end{align*}
-\vinayak{Note a slight difference with what I said in the intro. I realized that the intro definition is more faithful to the debate literature, but it's equivalent to this definition, so it doesn't change anything.}
+and $h(x) = y$ for this $y$. 
+% \begin{align*}
+% ~\exists~\ct^1\in\C~\forall~\cf^1\in\C~\exists~\ct^2\in\C~\forall~\cf^2\in\C\ldots~\exists~\ct^n\in\C ~\forall~\cf^n\in\C ~:~
+%  v(x, \ct^1, \cf^1, \ct^2, \cf^2, \ldots,  \ct^n, \cf^n) = y
+%  % \\ \iff h(x) = y
+% \end{align*}
+%is equivalent to $h(x) = y$.
 % \vinayak{
 % This ensures that the situation where there is a valid debate transcript for both labels does not happen.
 % }
-In this case, we also say that $v$ is a verifier for hypothesis $h$. We call a verifier \emph{valid} if there exists a hypothesis $h$ that is validated by $v$.
+In this case, we also say that $v$ is a \emph{verifier} for hypothesis $h$. We call a verifier \emph{valid} if there exists a hypothesis $h$ that is validated by $v$.
 \end{definition}
-Note that a given valid verifier $v$ validates only one unique hypothesis $h$ in the above sense. We will use notation $h_v$ for this hypothesis when we want to make this relationship between verifier and its hypothesis explicit. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.\ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}\vinayak{Yes this is true, and I think this is kind of important, so we should keep it this way.}
+
+Note that a given valid verifier $v$ validates exactly one hypothesis $h$ in the above sense. We will use notation $h_v$ for this hypothesis when we want to make this relationship between verifier and its hypothesis explicit. On the other hand, a given hypothesis $h$ may be validated by multiple verifiers $v$.
+% \ruth{This is still true? Does it matter? Or should we assume $\V$ is pruned in a way that there is a one to one correspondence between $\H$ and $\V$?}\vinayak{Yes this is true, and I think this is kind of important, so we should keep it this way.}\sivan{I agree with that this is important to keep}
 % ~\vinayak{Oh I see. I have been thinking of verifiers as uniquely defining a hypothesis. Given an $x$ and a $v$, I think only one unique label should meet the condition above, and that label will define a unique hypothesis. I think Tosca is saying the same thing below.}. 
-We will call a set of valid verifiers a \emph{verifiers class}, and use notation $\V$ to denote a verifier class. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
-For a hypothesis class $\H$ we will say that $\H$ is \emph{supported by verifier class} $\V$ if $\H = \H_\V$.
+We call a given set of valid verifiers a \emph{verifiers class}, and denote it $\V$. Further, we let $\H_\V$ denote the hypothesis class of all functions that are validated by verifiers $v\in\V$. If clear from context, we may simply write $\H$ for $\H_\V$.
+For a hypothesis class $\H$ we say that $\H$ is \emph{supported by verifier class} $\V$ if $\H = \H_\V$.
 
 % \tosca{I think one thing that is still missing here is that we want the label that is certified to be unique. In the current definition there exists a hypothesis that verfies \emph{all hypotheses}. I suggest we add "soundness" of a verifier somewhere (i.e. it for every $x$ there exists no more than one label $y$ that $v$ verfifies)}
 
-\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$. In the \emph{realizable case} the verifier $v^*$ validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).~\vinayak{In the \emph{unrealizable} case, $v^*$ still validates $h^*$, but its output gets corrupted during $k$ of the rounds. We call these rounds \emph{misspecified}} Of course, debaters \dt and \df don't know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
+\paragraph{Learning via debate} The goal of \emph{learning via debate} is to recover an underlying \emph{true hypothesis}, which we denote by $h^*$. We assume that the two debaters interact with a verifier $v^*\in\V$ that validates the true hypothesis $h^*$ (and thus $h^*\in\H = \H_\V$).
+In the \emph{realizable case} all label feedback is provided by the verifier $v^*$.
+In the \emph{$k$-non-realizable} case, the label feedback in at most $k$ rounds may be different from that of $v^*$. We call these rounds \emph{misspecified}. Of course, debaters \dt and \df do not know the identity of $h^*$ nor the identity of $v^*\in\V$. They only have access to the verifier class $\V$, and thereby also to its induced hypothesis class $\H_\V$.
 
-\paragraph{The debate protocol}
-
+We first give the debate protocol for the realizable setting. 
+\paragraph{The debate protocol:}
 \begin{itemize}
 \item For rounds $t = 1\ldots T$ repeat:
 \begin{enumerate}
  \item The environment poses an $x_t\in\X$
- \item Debater \dt hypothesizes label $\hy_t$
+ \item Debater \dt hypothesizes label $\hy_t$ (also called ``prediction'' or ``predicted label'')
  \item For $i = 1 \ldots n$ repeat:
  \begin{itemize}
   \item Debater \dt brings argument $\ct^i_t$ (in support of label $\hy_t$)
   \item Debater \df brings argument $\cf^i_t$ (aiming to falsify label $\hy_t$)
  \end{itemize}
 Let $\sc_t=(\ct^1_t,\cf^1_t,\ldots,\ct^n_t,\cf^n_t)$.
- \item ~\vinayak{The environment adversarially decides whether round $t$ is misspecified.  The debaters receive $\vy_t=v^*(x_t,\sc_t)$ if the round is not misspecified and $\vy_t=1-v^*(x_t,\sc_t)$ if it is. They are not told whether the round is misspecified.}\\
-       The environment records (but does not reveal) $\ty_t = h^*(x_t)$ \ruth{Should this be here? Or does it look like the environment is committing to more than we intend? Should we rather let the environment explicitly choose the labels $y^*$ only after the $T$ rounds of debate? But what would this mean if $T$ is infinite? I'll keep the statements that the true labels are recoded here, but please comment on what you think is the right formaliztion}~\vinayak{I'm not sure it matters, since we want to prove our bounds for the worst-case environment. A similar thing happens in standard binary classification, right? We can either say that nature picks an $h^*$ before the game begins, and then ask that our algorithm gets a finite mistake against all nature choices, or we can say that nature picks a $y$ at each time step as long as the version space remains non-empty. Both lead to the same bounds?}
-       \ruth{In the usual case, the environment commits to the labels anyways, since the labels are actually given as feedback to the learner in each round. Here the learner only gets the verifier feedback, that is not yet full information on the labels $y^*$... In our analysis we allow the environment to choose any sequence of true labels that is consistent with the verifier observations, so it does seem different.
-       
-       I guess in the finite $T$ case, we could allow the environment to choose the labels only at evaluation time. For infinite $T$ (when we want to talk about sublinear regret etc), then maybe the we view the process as ``stoppable'' at any point, and ask what the regret would be then? Would that be the standard way of thinking about this?
-       
-       But maybe I am overcomplicating and it's actually fine as written..}
+ \item The debaters receive $\vy_t=v^*(x_t,\sc_t)$. 
+ \item %~\vinayak{The environment adversarially decides whether round $t$ is misspecified.  The debaters receive $\vy_t=v^*(x_t,\sc_t)$ if the round is not misspecified and $\vy_t=1-v^*(x_t,\sc_t)$ if it is. They are not told whether the round is misspecified.}\\
+       The environment records (but does not reveal) $y_t = h^*(x_t)$ 
 \end{enumerate}
-\item The debate is evaluated through the \emph{number of mistakes} and the \emph{debate regret}
-\begin{align*}
- \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t]\quad\text{define regret in comparison to optimal debaters(?)}
-\end{align*}
-\item Debater \dt is evaluated through its \emph{loss} and its \emph{regret}
-\begin{align*}
- \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \tLo(T) - \#\text{misspecified rounds}
-\end{align*}
-\ruth{In the realizable case all rounds are achievable for \dt, but probably not in the agnostic case?} \tosca{We got into a debate about how to formalize this in our meeting in Hamilton last week as well. In other settings we often just deducted $k$ (the number of exceptions), which may be an overestimation of non-achievable rounds. }
-\item Debater \df is evaluated through \emph{loss} and its \emph{regret}
-\begin{align*}
- \fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t]\quad\text{and}\quad \Re_F(T) = \fLo(T) - \#\text{unachievable rounds for \df}
-\end{align*}
 \end{itemize}
-\ruth{We might want to make the presentation of the protocol more compact; still need to define unachievable rounds properly}
-\vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
 
-\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
+A run of the debate protocol is evaluated through the \emph{number of mistakes} in predicting the label $y_t$. For a fixed interaction sequence, denote the number of mistakes by
+\begin{align*}
+ \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t].
+\end{align*}
 
-The number of rounds may be finite ($T\in\naturals$) or infinite ($T = \infty$).
-We note that the evaluation of the two debaters is distinct from the evaluation of the overall debate. Debater \dt is evaluated against its aim to defend its hypothesized label $\hy_t$ in each round $t$. Debater \df on the other hand is evaluated against its aim to falsify the hypothesis that the first debater proposed. That is, debater \df, is aiming to set its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
-The value of the overall debate that the two debaters produce is measured by assessing whether through their interactions with the verifier the hypothesized label of the proposer (eventually) agrees with the true, yet unrevealed, label $y^*$ that the environment responds with.
-% The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $y^*_t$ in each round.
+We can consider \dt and \df that can be cooperative, so as to minimize $\Mi(T)$. 
+In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity.
 
-\vinayak{
-\begin{claim}
-  $\Re(T) \leq \Re_T(T) + \Re_F(T) + 2k$.
-\end{claim}
-\begin{proof}
-Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
-\[
-\Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
-\]
-By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
-\end{proof}
-}
 
-We will study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation. We will distinguish between the \emph{cooperative case} and the \emph{combative case}. In the cooperative case both debaters are acting cooperatively so as to minimize the debate evaluation measures. We can think of this as a scenario where debater \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions having taking into account relevant potential counter-arguments. In contrast, in the combative case, both debaters are acting in a way to minimize their own evaluation measures respectively. Thus in this case, even debater true may put up hypothesized labels $\hy_t$ that it knows it can argue for even through it is already aware the this does not correspond to the underlying truth $y^*_t$. We study whether the true underlying hypotheses can be recovered in both scenarios.
 
-\vinayak{I'm not sure that I like the names ``cooperative'' and ``combative''. The point of studying the cooperative version was to understand the best way to use access to this kind of verifiers. The ``debate'' thesis is that the best way to use such a verifier is to set up two debaters and let them argue against each other. But we don't think that should be the case. So the question is, if we don't restrict ourselves to set up these debaters and simply understand the best way to use these verifiers, what's the best that can be done? So ``cooperative'' is really just more general and ``combative'' is more restrictive. This should be reflected in the names somehow.}
 
-\section{The Cooperative Case}
+In contrast, a standard approach for using debates considers the two debaters as considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
+We formalize this by defining a loss\vinayak{are there previous works that formalize it this way? (sivan)}~\vinayak{yes this is the standard loss function used in the literature. Often it's somewhat more general because the verifier gives a score, which can be a fraction, that judges how well does the debate transcript prove that the true label of $x$ is $\hat{y}$}\sivan{In this case we need a reference} for each debater. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
+\begin{align*}
+ \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].
+\end{align*}
+Debater \df, on the other hand, is evaluated against its aim to falsify the hypothesis that the first debater proposed, by setting its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
+Therefore, \df is evaluated through the opposite loss: 
+\begin{align*}
+ \fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t] = T - \tLo(T).
+\end{align*}
+In principle, this setting, in which each debater attempts to optimize its own loss, can lead \dt to propose hypothesized labels $\hy_t$ that it knows it can argue for, even though it is already aware that this does not correspond to the underlying true label $y_t$. 
+\vinayak{Is this assumption also standard in the debate literature? if so we need references (sivan)} We assume that each debater is unaware of the behavior of the other debater, and therefore runs its strategy assuming that the other debater can be adversarial to it, providing worst-case sequences with respect to its loss objective. This is optimal, in the sense if \dt and \df were each optimal against their opponent, then their worst-case loss would be equal to the worst-case loss that can be obtained by a debater that assumes that the other debater is adversarial (see Lemma~\ref{lem:equilibrium} in the appendix).\footnote{Note, however, that such an equilibrium does not necessarily exist for deterministic debaters \citep{vonneumann1928theorie}.}
+We call this the \emph{oppositional setting}. 
+
+
+\sivan{to adapt later: We study the number of mistakes incurred in both scenarios. We study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation.}
+
+
+
+
+
+
+
+
+\section{Cooperative debaters}
 \label{sec:cooperative-case}
-In this section, we start by exploring the cooperative case of learning via debate. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents potential runs of the debate protocol for debate length $n$.
+In this section, we start by exploring learning via debate using cooperative debaters. In this case we can call them together ``the learner''. To analyze which classes $\V$ of verifiers allow for learning with finite mistake bound, we will define a tree structure that represents potential runs of the debate protocol for debate length $n$.
 
-As usual in these types of trees, the nodes correspond to actions of the (potentially adversarial) environment. In our case, this includes the verifier's evaluations $\vy$. The edges in the tree record the debaters' actions. That is, an edge records the label $\hy$ that the \dt poses, as well as the debate $\sc$ of length $n$ that then ensues between the two debaters. A non-root node records the verifier's evaluation of the debate on the incoming edge for the domain point from the previous round, recorded in the node's parent, as well as the new domain instance that the environment poses for the next round.
+In our tree construction, edges correspond to all possible learner actions 
+and nodes correspond to worst-case actions of the environment. 
+This type of construction has been previously used in \cite{oz2026discriminative} for a different interactive learning protocol, Discriminative Feature Feedback. Nonetheless, as we will see below, our definition of dimension based on the tree will be quite different from standard ones, due to the special challenges of the debate protocol.
+
+In our case, the learner's action in each round includes the label $\hy$ that the \dt poses, as well as the debate $\sc$ of length $n$ that then ensues between the two debaters.
+The environment's actions include a verifier evaluation $\vy$ for some verifier consistent with the previous rounds, as well as the  domain instance that the environment poses for the next round.
 The root node only records the instance that the protocol is initiated with.
+
 
 
 \begin{definition}[Debate Tree]
@@ -182,22 +193,20 @@ We let $\Delta_n(\V)$ denote the set of all length-$n$-debate trees $\T$ for ver
 \end{definition}
 
 
-\sout{A debate tree for debate length $n$ as defined above corresponds to running the debate protocol indefinitely.}
-% \ruth{Actually I think I'll need to update this, since with infinite trees the lower bound argument doesn't go through...I was about to update the max's in the depth definition with sups, since they are over infinite trees, but if we use supremums there, the lower bound doesn't work, since there might be classes, where the learner can indefinitely postpone the realization of the ``looming'' mistakes, even through they keep looming on every path.. with finite trees the lower bound should definitly work, hopefully the upper bound through SOA also, need to think through...}
 Let $(\alpha,\beta)$ be an edge in the tree $\T$ and let $v\in\V$ be a verifier. We say \emph{$v$ is consistent with edge $(\alpha, \beta)$} if
 \[
-v(x_\alpha, \sc^\alpha_\beta) = v(x_\alpha, \ct^1_{\alpha\beta}, \cf^1_{\alpha\beta}, \ct^2_{\alpha\beta}, \cf^2_{\alpha\beta}, \ldots,  \ct^n_{\alpha\beta}, \cf^n_{\alpha\beta}) = \vy_\beta
+v(x_\alpha, \sc^\alpha_\beta) = v(x_\alpha, \ct^1_{\alpha\beta}, \cf^1_{\alpha\beta}, \ct^2_{\alpha\beta}, \cf^2_{\alpha\beta}, \ldots,  \ct^n_{\alpha\beta}, \cf^n_{\alpha\beta}) = \vy_\beta.
 \]
 Let $p$ be a directed path (down the tree) in $\T$. We say that the path $p$ is consistent with verifier $v$ if all edges in $p$ are consistent with $v$.
 
 To analyze learnability, we will define \emph{version spaces} of verifiers that agree with paths in the debate tree.
  We define the \emph{verifier version space of path $p$} to be the set
 \[
- \V_p = \{ v\in\V ~\mid~ v \text{ is consistent with all edges in }p\}
+ \V_p = \{ v\in\V ~\mid~ v \text{ is consistent with all edges in }p\}.
 \]
-Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$.
+Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$. Note also that more than one verifier may induce the same hypothesis.
 
-For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all \sout{infinite} root-to-leaf paths in $\T$ that start at $\alpha$.
+For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all root-to-leaf paths in $\T$ that start at $\alpha$.
 
 For version spaces, we may use the shorthand notations $\V^\alpha_\beta = \V_{p^\alpha_\beta}$ and $\V_\beta = \V_{p_\beta}$. That is $\V_\beta$ is the verifier version space at a node $\beta$ in the tree: $\V_\beta$ contains exactly those verifiers that are consistent with the debate protocol as run from the beginning $\rho$ to node $\beta$ in the tree. Analogously, we use $\H^\alpha_\beta$ and $\H_\beta$ for the corresponding induced hypothesis version spaces.
 
@@ -205,22 +214,25 @@ For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagre
 \[
  \mi(h, p) = \sum_{(\alpha, \beta)\in p}\indct[h(x_\alpha)\neq \hy^\alpha_\beta]
 \]
-Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred with respect to candidate verifier $v$.
+Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred assuming that candidate verifier $v$ is the true $v^*$.
 
-For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all \sout{infinite} root-to-leaf paths in $\T$ that are starting at $\alpha$.
+% \sivan{I don't think that's true - the verifier can return labels that are not true if it gets bad arguments}\ruth{yes, that's why we're comparing $h$ to the the labels $\hy$, and don't make any conclusions from the potentially bad labels $\vy$, other than saying $h_v$ is ``still in the game'', and $\mi(h_v, p)$ would be the number of incurred mistakes if $v$ was the true verifier; so statement seems fine to me}\sivan{I understood "mistakes the debaters incurred with respect to candidate verifier $v$" as rounds in which $\hy \neq \vy$. I think you meant something else. I reworded to clear this up.}\ruth{sounds good}
+
+For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all root-to-leaf paths in $\T$ that are starting at $\alpha$.
 We define the \emph{depth} of subtree $\T^\alpha$ with respect to verifier class $\V$ as follows:
 \[
-\depth(\T^\alpha, \V) = \min_{q\in P^\alpha}~ \max_{h\in \H_\alpha \cap \H_q}~  ( \mi(h, p_\alpha) + \mi(h, q) )
+\depth(\T^\alpha, \V) = \min_{q\in P^\alpha}~ \max_{h\in \H_\alpha \cap \H_q}~  ( \mi(h, p_\alpha) + \mi(h, q) ).
 \]
-
 % \[
 % \depth(\T^\alpha, \V) = \min_{p\in P^\alpha}~ \max_{\beta\in p}~ \max_{h\in \H_\alpha \cap \H^\alpha_\beta}~  ( \mi(h, p_\alpha) + \mi(h, p) )
 % \]
 
 Note that the depth of a subtree rooted at $\alpha$ counts the number of (past and future) mistakes that the debate could incur with verifiers that are consistent with the path up to $\alpha$.
+The use of past mistakes in the depth of a subtree is crucial: because the learner (the debaters) never directly finds out the true  labels $y_t$, it must keep track of all consistent hypotheses and its mistakes with respect to them throughout the run.
+% \ruth{good to add this sentence, but notation with index $t$ not introduced here, would replace with ``true label $y^*$''}\sivan{we introduce $y_t$ in the debate protocol above}\ruth{true :)}
 The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that is $\depth(\T) = \depth(\T^\rho)$. Note that at the root node, there is no past, and thus only future mistakes are counted:
 \[
-\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{q\in P^\rho}~ \max_{h\in \H_\V \cap \H_q}~  ( \mi(h, p_\alpha) + \mi(h, q) )  = \min_{q\in P^\rho}~ \max_{h\in \H_{q}}~    \mi(h, q)
+\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{q\in P^\rho}~ \max_{h\in \H_\V \cap \H_q}~  ( \mi(h, p_\alpha) + \mi(h, q) )  = \min_{q\in P^\rho}~ \max_{h\in \H_{q}}~    \mi(h, q).
 \]
 
 % \[
@@ -228,37 +240,45 @@ The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that i
 % \]
 %
 % \ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
-With this we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
+With this, we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
 \begin{definition}[Debate Littlestone Dimension]
- Let $\V$ be a verifier class for domain $\X$, $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
+ Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length.\sivan{does it really make sense to use Littlestone in the name? except the fact that it's a tree it's not really related} The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
  \[
-  \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V)
+  \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V).
  \]
 If the length $n$ is fixed (or clear from context) we will also use the shorthand notation $\dldim(\V) =   \dldim(\V, n)$.
 \end{definition}
-We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with finite mistake bound.
+We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with a finite mistake bound. Moreover, the optimal mistake for learning $\H$ through access to $\V$ is exactly the debate Littlestone dimension of $\V$.
+\sivan{it would be stronger to say that the optimal mistake bound is exactly the dimension}\ruth{added a sentence above}\sivan{but don't we want this in the theorem? By the way, the theorem is  missing a proof}
 
 \begin{theorem}
-Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if there is a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
+Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if the learner has access to a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
 \end{theorem}
-\ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
-\sivan{I don't think this holds. You could have a verifier class that reveals H exactly using "hidden" values, while another class does not. I'm not sure if we need a dimention for H though}
-We start by showing that the debate Little stone dimension induces a lower bound on the number of mistakes that the environment can enforce.
+% \ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
+% \sivan{I don't think this holds. You could have a verifier class that reveals H exactly using "hidden" values, while another class does not. I'm not sure if we need a dimention for H though}\ruth{ok, removing the comment}
+We start by showing that the debate Littlestone dimension induces a lower bound on the number of mistakes that the environment can enforce.
 
 \begin{lemma}
-Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, for any choices of the debaters in the debate protocol with verifier class $\V$, the environment can enforce $d$ many mistakes.
+Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, for any deterministic choices of the debaters in the debate protocol with verifier class $\V$, the environment can enforce $d$ mistakes within finitely many rounds.
 % \begin{align*}
 %  \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t] \geq d
 % \end{align*}
 \end{lemma}
 
 \begin{proof}
-Assume $\dldim(\V, n) = d$. Since $d\in\naturals$ is finite, there exists a debate tree $\T$ with $\depth(\T,\V) = d$. 
-Since every path in $\T$ is finite, and the fan-out of the tree $\T$ is finite (for finite certificate space) the definition of depth
+Assume $\dldim(\V, n) = d$. 
+Since $d\in\naturals$ is finite, there exists a debate tree $\T$ with $\depth(\T,\V) = d$. 
+From the definition of depth
 \[
 \depth(\T,\V) =  \min_{p\in P^\rho}~  \max_{h\in \H_p}~ \mi(h, p)
 \]
+it follows that for any $p \in P^\rho$, there is some $h$ that induces $d$ mistakes. Let $t_p$ be the round after which this $h$ has induced $d$ mistakes in path $p$. Note that every $p$ in $\T$ is finite, and the fan-out of the tree $\T$ is finite (since $\C$ is finite). Hence, 
+$\max_{p\in P^\rho} t_p$ is some $b \in \naturals$. 
+It follows that for any sequence of outputs chosen by the learner, the environment has verifier responses and a consistent choice of $h$ that enforce $d$ mistakes in at most $b$ steps. 
+
+\iffalse
 implies that there is uniform upper bound $b < \infty$, such that the $d$ mistakes that are possible on every path $p$ in the tree (ie for any choice of the debaters), can be enforced by the environment within $b$ steps. \ruth{argument could be expanded, assume there doesn't exist that uniform upper bound $b$, then at every step there exists a choice where the mistakes can be postponed arbitrarily long, and that leads to an infinite path in the tree}
+\fi
 % \ruth{actually might not be sufficient when the certificate space in infinite? yes.. we need bounded fan-out for this argument..}, the definition of depth
 % \[
 % \depth(\T,\V) =  \min_{p\in P^\rho}~ \max_{\beta\in p}~ \max_{h\in \H_\beta}~ \mi(h, p)
@@ -267,7 +287,7 @@ implies that there is uniform upper bound $b < \infty$, such that the $d$ mistak
 % \ruth{For trees: there does not exist a tree with finite fan-out and arbitrarily long paths, that does not also have an infinite path. But with infinite fan-out this is not true, one can have a node with finite paths of every length starting at that node... }
 \end{proof}
 
-For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol is now in round $t$, and let \sout{$q$} \sivan{$p_t$} be the path (of a debate tree) recording the previous rounds. Letting $x_t,\hy_t,\sc_t,\vy_t$ be the record of round $t$, we define $p_t$ to include $x_t$ but not $\hy_t,\sc_t,\vy_t$.
+For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol is now in round $t$, and let \sout{$q$} \sivan{$p_t$} be the path (of a debate tree) recording the previous rounds. Letting $x_t,\hy_t,\sc_t,\vy_t$ be the record of round $t$, we define $p_t$ to include $x_t$ but not $\hy_t,\sc_t,\vy_t$.\ruth{should this be $\vy_{t+1}$? or do we let the indices of the $x$ and $\vy$ in a node in the tree be different?}\sivan{yes they are different, $\vy_t$ corresponds to the response to $\hy_t$ and the same node includes the next example which is $x_{t+1}$. }
 
 
 Then the current verifier version space is \sout{$\V_q$} \sivan{$\V_{p_t}$}. An optimal learner needs to take the action $(\hy, \sc)$ that minimizes the maximal number of mistakes the environment will be able to enforce. The environment can enforce mistakes by combining past mistakes that happened on \sout{$q$}\sivan{$p_t$} with future mistakes that may happen in a debate tree from this point on \emph{through the same function $h$}. Thus, our learner chooses $(\hy, \sc)$ that minimizes
@@ -328,9 +348,8 @@ Then we have
 \min_{\hy,\sc}\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hy,\sc)} f((x_t,\hy,\sc);q'_\T) =: R
 %&= \min_{\hy,\sc}\sup_{\T\in\Delta_n(\V_{p_t},x_t)} f((x_t,\hy,\sc);q'_\T)
 \end{align*}
-\sivan{do we need this to be compact to choose $\T^*$??? it suffices that the value is bounded, verify}
 
-Define $\T_{\hy,\sc} \in \argmax_{\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)}f((x_t,\hy,\sc);q'_\T)$ 
+Define $\T_{\hy,\sc} \in \argmax_{\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)}f((x_t,\hy,\sc);q'_\T)$ (if a maximum exists)\footnote{A similar argument can be made if there is no maximum, by using a sequence of $\T_{\hy,\sc}$ choices that are larger than a sequence converging to the supremum}
 and let $\T^*$ be the tree constructed by joining each of the trees $\T_{\hy,\sc}$ at the root $x_t$. Note that $\T^* \in \Delta_n(\V_{p_t},x_t)$. Let $X_{\hy,\sc}$ be the set of paths that start with $(x_t, \hy,\sc)$.
 
 \[
@@ -351,7 +370,7 @@ We now upper bound the LHS.
   &\quad=\min_{\hy,\sc}\max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_{t-1},\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_{t-1},\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_{t-1}) + \mi(h,q)+\indct[h(x_{t-1}) = \hy]) \\
   &\quad= \min_{\hy,\sc}Q_{t-1}(\hy,\sc).
 \end{align*}
-We conclude that $\min_{\hy,\sc}Q_{t}(\hy,\sc) \leq \min_{\hy,\sc}Q_{t-1}(\hy,\sc)$. Now consider $Q_1$. By definition, $\mi(h, p_t) = 0$ since $p_1$ includes no predictions, and 
+We conclude that $\min_{\hy,\sc}Q_{t}(\hy,\sc) \leq \min_{\hy,\sc}Q_{t-1}(\hy,\sc)$. Now consider $Q_1$. By definition, $\mi(h, p_t) = 0$ since $p_1$ includes no hypothesized labels, and 
 similarly to the above,
 \[
 \min_{\hy,\sc}Q_1(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_1,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_1,\hy, \sc, \vy)}\cap \H_q} (\mi(h,q) +\indct[h(x_t) \neq \hy]).
@@ -372,7 +391,7 @@ The first inequality follows by the realizability assumption, which implies that
 \end{proof}
 
 
-\ruth{The following still needs to be shown, but should be ok:}
+\ruth{The following still needs to be shown, but should be ok:}\sivan{are we using this lemma anywhere? we can remove if we don't}
 \begin{lemma}
 Let $\T$ be a debate tree and let $\alpha$ be a node in $\T$. Then
 \[
@@ -380,7 +399,148 @@ Let $\T$ be a debate tree and let $\alpha$ be a node in $\T$. Then
 \]
 \end{lemma}
 
-\subsection{Non-realizable case}
+
+\section{\textcolor{red}{Some things we want to do}}
+
+\begin{itemize}
+    \item kd lower bound  - Tosca
+    \item kd upper bound - Sivan?
+    \item Lemma 6 - show that infinite certificate class doesn't work - Tosca?
+    \item oppositional case dimensions - Sivan, working on it
+    \item oppositional case agnostic - ??
+    \item is online learning always easier? - Tosca?
+\end{itemize}
+
+
+
+\section{Oppositional debaters}
+
+We now consider the case of oppositional debaters, in which each debater attempts to optimize their loss with respect to a potentially adversarial opponent. We show that in this setting, the protocol's mistakes can be upper bounded by the regrets of the two opposing debaters. 
+
+In the realizable setting, given $v^*$, there is a strategy for \dt that obtains $\tLo(T) = 0$, since it can choose $\ct^1,\ldots,\ct^n$ that satisfy the validation requirement of $v^*$ for any $\cf^1,\ldots,\cf^n$. Thus, the regret of \dt is equal to its loss: 
+$\tRe(T) = \tLo(T)$. 
+
+For \df, even given $v^*$, there could be rounds where a loss is inevitable, because \dt selected arguments that cannot be refuted. 
+We call such rounds \emph{unachievable} for \dt. Let $U(T)$ be the number of unachievable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. 
+
+The following result shows that the total regret of the debaters upper bounds the total mistakes of the debate protocol. This motivates the oppositional setting: If each debater selfishly succeeds to obtain a lower regret, it also reduces the prediction error of the protocol.\footnote{\sivan{Note in particular, that if \df wants to minimize its regret, it can do so by helping \dt identify the true $v^*$, since this would lead to $U(T) = T$ and $\fRe(T) = 0$. However, this may require \df to make assumptions on the behavior of \dt and not treat its input as fully adversarial.}}
+
+
+
+% The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $y^*_t$ in each round.
+
+\begin{claim}
+  $\Re(T) \leq \Re_\ct(T) + \Re_\cf(T)$.
+\end{claim}
+\begin{proof}
+In an unachievable round,  \dt's choices force $v^*$ to output $\hy_t$, regardless of the choices of \df. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no prediction mistakes in these rounds. Hence, $\Mi(T) \leq T-U(T)$. In every round, exactly one of the debaters incurs a loss, so
+$T =  \tLo(T)+\fLo(T)$. Therefore
+\[
+\Mi(T) \leq \tLo(T)+\fLo(T)-U(T) = \Re_\ct(T) + \Re_\cf(T).
+\]
+As claimed.
+\end{proof}
+
+
+\input{cooperative-example}
+
+
+\subsection{(\sivan{work in progress) dimensions for oppositional debaters}}
+
+To evaluate the worst-case regret of an oppositional debater against an adversary, we can define appropriate dimensions for \dt and \df.
+For simplicity, we define this for debates of length $n=1$. \sivan{to add how this works for other $n$}
+In this construction, similarly to above, edges correspond to all possible actions of the debater, and nodes correspond to worst-case actions of the environment and the other debater. Unlike the $\dldim$, in this case defining the dimension for each debater is straightforward, since their loss is directly observed. 
+
+In a tree for \dt with verifier class $\V$, each tree node is of the form $(\cf,\vy,x)$, and each edge is labeled with $(\vy, \ct)$. The root node is $(\sqcup,\sqcup,x)$. Each node has exactly one down-directed edge for each possible \dt action $(\hy, \ct)$. Each path from root to leaf is consistent with some $v \in \V$. Moreover, each edge labeled $(\hy, \ct)$ ends in a node with $\vy \neq \hy$. The depth of such a tree is defined as the minimum over the length over all its paths. The dimension $\ctd(\V)$ is defined as the maximum depth of a tree of this type. \sivan{this could probably be more formal...}
+
+\begin{claim}
+    In the realizable setting, for any \sivan{deterministic} choices of \dt with verifier class $\V$, the environment can enforce \dt to incur a loss of $\ctd(\V)$ on \dt. Moreover, there exists a deterministic strategy for \dt that never incurs a loss of more than $\ctd(\V)$.
+\end{claim}
+In this case, the SOA construction is similar to that of \cite{oz2026discriminative}: In each round with domain instance $x$, let the current version space be $\V'$. Let 
+$\V'(\hy,\ct,\cf) = \{v \in \V' \mid v(x,\ct,\cf) \neq \hy\}$. 
+The action $(\hy,\ct)$ selected by $\dt$ is some action in   
+$\argmin_{(\hy,\ct)} \max_{\cf}(\ctd(\V'(\hy,\ct,\cf)))$. It is easy to see that if $\ctd(\V') \geq 1$, then $\min_{(\hy,\ct)} \max_{\cf}(\ctd(\V'(\hy,\ct,\cf))) < \ctd(\V')$, otherwise one could construct a \dt tree for $\V'$ with a larger depth than $\ctd(\V')$. Thus, by induction, after at most $\ctd(\V)$ steps, $\ctd(\V') = 0$, indicating that \dt can avoid additional loss rounds by choosing its actions wisely. For the converse, it is easy to see that given a verifier class with a finite $\ctd(\V)$, an adversary can enforce $\ctd(\V)$ on any deterministic \dt by taking the actions in the tree nodes corresponding to the path chosen by \dt.
+
+
+For \df and verifier class $\V$, we again construct a corresponding tree. %However, in this case, we are interested in the regret $\Re_\cf$ and not the loss. This is because an adversary that sets $x,\ct$ \textbf{\sivan{xXXXXXXXXXXXXXXxxx}}
+Each tree node is of the form $(\vy,x,\hy, \ct)$, representing the verifier label $\vy$ for the previous round, the new domain instance $x$ and the response $(\hy, \ct)$ of \dt to $x$. Each edge is labeled with some $\cf \in \C$, representing the action of \df. The root node is of the form $(\sqcup,x,\hy, \ct)$. Each node has exactly one down-directed edge for each possible \df action $\cf \in \C$. Each path from root to leaf is consistent with some $v \in \V$. 
+Moreover, each edge starting at a node $(\vy,x,\hy, \ct)$ ends in a node with $\vy = \hy$, incurring a loss of $1$ for \df. The depth of such a tree is defined as the minimum over the length over all its paths. 
+
+
+\sivan{TODO: define the depth with respect to the loss only, since this is what this debater optimizes. The dimension $\cfd(\V)$ is defined as the maximum depth of a tree of this type. }
+
+\section{\sivan{todo unrealizable case}}
+
+In the $k$-non-realizable setting for $k \in \naturals$, we consider the same debate protocol as described above, except that in at most $k$ rounds, the environment may provide $\vy \neq v^*(x_t, \sc_t)$.
+\sivan{perhaps the oppositional should be later}
+In this case, in the oppositional setting we extend the regret to account for misspecified rounds. For \dt, we define $\Re_\ct(T) = \tLo(T) - k$, where $k$ is the minimal value such that the sequence is $k$-non-realizable. For \df, we define 
+$\Re_\cf(T) = \fLo(T) - k - k'$, where $k$ is the minimal value such that the sequence is $k$-non-realizable and $k'$ is the number of realizable rounds that are unachievable. 
+
+\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
+
+and the \emph{debate regret}
+quad\vinayak{\text{define regret in comparison to optimal debaters(?)}}
+unachievable rounds
+\dt is evaluated through its \emph{loss} and its \emph{regret}
+\begin{align*}
+ \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \tLo(T) - \#\text{misspecified rounds}
+\end{align*}
+
+\vinayak{Things are a bit more complicated in the agnostic case because two different kinds of things make it impossible to achieve 0 loss: 1) if there is misspecification, i.e., no hypothesis in the class assigns the true label, and b) if its an anachievable round, i.e., \dt has picked the ``correct'' certificate and so \df cannot possibly win.}
+
+
+\vinayak{
+\begin{claim}
+  $\Re(T) \leq \Re_\ct(T) + \Re_\cf(T) + 2k$.
+\end{claim}
+\begin{proof}
+Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
+\[
+\Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
+\]
+By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
+\end{proof}
+}
+
+\subsection{An upper bound (cooperative) \sivan{todo}}
+
+\sivan{references? did chat build on something? also cite upper bound of DFF and why it doesn't work here}
+\begin{theorem}
+    Assume the $k$-non-realizable setting. For any verifier class $\V$ with $\dldim(\V) = d \in \naturals$, there is a randomized learning strategy for cooperative debaters that incurs at most $16kd$ mistakes in expectation. 
+\end{theorem}
+\begin{proof}
+The strategy works as follows: 
+\begin{itemize}
+    \item Initialize $4k$ copies of SOA for $\V$.
+    \item In each round $t$
+    \begin{itemize}
+        \item Set $\hy_t$ to the majority label proposed by the $4k$ copies.
+        \item Set $\sc_t$ to the certificate $\sc$ suggested by one of the copies $i_t$, where $i_t$ selected uniformly at random from $[4k]$. Get $\vy_t$ and feed it to the same copy.
+    \end{itemize}
+\end{itemize}
+Call a copy ``uncorrupted at time $t$'' if it has not been provided with a corrupted feedback until round $t$. Since There can be at most $k$ misspecified rounds, at least $3k$ copies are uncorrupted at each time $t$. 
+
+For round $t$, let $M_t = \indct[\hy_t \neq y_t]$. Let $\hy_t^i$ be the label proposed by copy $i$ at round $t$, and define $Z_t = \indct[\hy_t^{i_t} \neq y_t \wedge i_t \text{ is uncorrupted at time }$t$]$. Any copy $i_t$ can make at most $d$ mistakes as long as it is uncorrupted. Hence, $\sum_t Z_t \leq 4kd$. On the other hand, if $M_t = 1$, then at least $2k$ copies $i$ have $\hy_t^{i} \neq y_t$ in round $t$, and at least $k$ of these are uncorrupted at time $t$. 
+Therefore, for any history $H_t$ of the run until round $t$, $\Pr(Z_t = 1 \mid M_t = 1, H_t) \geq 1/4$. 
+Thus,
+\[
+\ex[Z_t \mid H_t] \geq \ex[Z_t = 1 \mid M_t = 1, H_t]\cdot \ex[M_t = 1 \mid H_t] \geq \ex[M_t = 1 \mid H_t]/4.
+\]
+Therefore,
+\[
+4kd \geq \ex[\sum_t Z_t] = \sum_t \ex[Z_t \mid H_t]
+\]
+
+
+, it implies $\ex[Z_t] \geq 1/4 \ex[M_t]$. But since $\sum Z_t \leq 4kd$, we get that $\sum_t \ex[M_t] \leq 16kd$.
+\end{proof}
+
+\subsection{A lower bound (separation between unrealizable and realizable learning)}
+\label{sec:agnostic-example}
+\input{agnostic-example}
+
+
+\subsection{A stronger lower bound \tosca{???}}
 We will now consider the case in which instead of knowing a class perfectly, there exists some noise feedback, or misspecification.
 Formally, we will consider the $k$-nonrealizable case, i.e., situations in which all but $k$ rounds are consistent with the behaviour of a verifier $v\in \V$.
 
@@ -391,25 +551,44 @@ Formally, we will consider the $k$-nonrealizable case, i.e., situations in which
     Consider $\X= \C = \naturals$.  Consider $\mathcal{H} = \{h_a: \X \to \Y: a\in \{0,1\}\}$, where $h_a(x) = a$ for all $x\in \mathcal{X}$. We now will construct a verifier class, that is easy to learn in the realizable setting but hard to learn in the $k$-non-realizable setting.
   To ensure that the class we construct is indeed a verifier class for $\mathcal{H}$ we will consider verifiers $v$, such that there exists $h\in \mathcal{H}$ and $b\in \{0,1\}$ with:
   \begin{itemize}
-      \item For all $x \in \mathcal{X}$, for $c_1 =1$, $\forall c_2, c_3 = 1, \forall c_4, \dots, c_{2n-1}= b, \forall c_{2n}  $: $v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{2n}) = h(x) $.
-      \item There is $c_{\mathrm{outlier}}$ such that all $x \in \mathcal{X}$, for $c_1 =1$, $\forall c_2 \in \C, c_3 = 1, \forall c_4 \in \C , \dots, c_{2n-1}= 1- b, \forall c_{2n}  \in \C \setminus \{c_{\mathrm{outlier}}\}$: $v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{2n}) = 1-h(x) $ and $c_1 =1$, $\forall c_2 \in \C, c_3 = 1, \forall c_4 \in \C , \dots, c_{2n-1}= 1- b, \forall c_{2n}   =c_{\mathrm{outlier}} $, $v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{2n}) = h(x) $.
-      \item For every $c_1 \in \C \setminus \{0,1\}$, for $c_2 = 0 $, for all $c_3, \dots, c_{2n} \in C$, we have $v(x,c_1, c_2, c_3, \dots, c_{2n}) = 0$ and $c_1 \in \C \setminus \{0,1\}$, for $c_2 = 1 $, for all $c_3, \dots, c_{2n} \in C$, we have $v(x,c_1, c_2, c_3, \dots, c_{2n}) = 1$. 
-      \item For every $c_1\in \C \setminus \{0,1\}$ there is $l \in \{0,1\}$
+      \item For all $x \in \mathcal{X}$, for $c_1 =1$, $\forall c_2 \dots c_{2n-2}\in \C, \dots, c_{2n-1}= b, \forall c_{2n}  $: $v(x, c_1, c_2, c_3,c_4, \dots, c_{2n-1}, c_{2n}) = h(x) $.
+      \item There is $c_{\mathrm{out}},c_{\mathrm{lier}}, $ such that all $x \in \mathcal{X}$, for $c_1 =1$, $\forall c_2, \dots, c_{2n-2} \in C,  c_{2n-1} \in \C \setminus \{b\}$: $v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{\mathrm{out}}) \neq v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{\mathrm{lier}}) $% 1-h(x) $ and $c_1 =1$, $\forall c_2 \in \C, c_3 = 1, \forall c_4 \in \C , \dots, c_{2n-1}= 1- b, \forall c_{2n}   =c_{\mathrm{outlier}} $, $v(x, c_1. c_2, c_3,c_4, \dots, c_{2n-1}, c_{2n}) = h(x) $.
+      \item For every $c_1 \in \C \setminus \{1\}$, for $c_2 = 0 $, for all $c_3, \dots, c_{2n} \in C$, we have $v(x,c_1, c_2, c_3, \dots, c_{2n}) = 0$ and $c_1 \in \C \setminus \{0,1\}$, for $c_2 = 1 $, for all $c_3, \dots, c_{2n} \in C$, we have $v(x,c_1, c_2, c_3, \dots, c_{2n}) = 1$. 
+      \item For every $c_1\in \C \setminus \{0,1\}$ there is $l \in \{0,1\}$, such that for every $c_2\in \naturals \setminus \{0,1\}$ and every $c_3, \dots, c_{2n} \in \naturals$: $v(x,c_1, \dots, c_{2n})= l $.
   \end{itemize}
-    This condition makes sure that there is always one successful debate strategy (in which the $\dt$ always chooses from $\{0,1\} \subset \naturals$) which reveals the true label on every instance. However, in the combative setting it is still hard for $\dt$ to learn that strategy.
-    The third condition above makes sure that the verifier validates exactly one hypothesis in $\mathcal{H}$.
+    This condition makes sure that there is always one successful debate strategy (in which the $\dt$ always chooses from $1$ in the first $n-1$ rounds and then chooses some certificate $b$ that is specific to $v$) which reveals the true label on every instance. However, learning this strategy is still hard for $\dt$ to learn that strategy, as all candidates for $b$ would have to be tried out (and there may not be feedback that distinguishes between getting the correct $b$ or not. However, formally this still ensures that $\mathcal{V}$ is a debate class.
+    The second and third condition above makes sure that the verifier validates exactly one hypothesis in $\mathcal{H}$.
+    The last condition just states that if both $c_1$ and $c_2$ are not $0$ or $1$, then the rest of the dialogue will always evaluate to a specific label $l$. We will now use this specific label in order to encode the hypothesis $h$, in the following way.
+    The idea is to encode a binary path of certificates (that work for every $x$, such that the label at the $d$-th element of that path will reveal whether the ground truth hypothesis is $h_0$ or $h_1$.
+    More formally, consider the binary representation of natural numbers, i.e. $\overline{100}=4$. Now the class $\V$ will only contain verifiers $v$ for which there exists a sequence $a_1, \dots a_d \in \{0,1\}$
+    \begin{itemize}
+        \item For every $x\in \X$, for $c_1 = \dots =c_{2n} = \overline{100}$: $v(x, c_1, \dots, c_{2n}) = a_1$
+        \item For every $x\in \X$, for $c_1 = \dots =c_{2n} = \overline{a_1100}$, $v(x, c_1, \dots, c_{2n}) = a_2$
+        \item $\dots$
+        \item For every $x \in \X$ for $c_1 = \dots = c_{2n} = \overline{a_{r-1} \dots a_1 1 00}$, we have $v(x, c_1, \dots, c_{2n}) = a_r$
+        \item $\dots$
+        \item For every $x \in \X$ for $c_1 = \dots = c_{2n} = \overline{a_{d-2} \dots a_1 1 00}$, we have $v(x, c_1, \dots, c_{2n}) = a_d$
+        \item For every $x \in \X$ for $c_1 = \dots = c_{2n} = \overline{a_{d-1} a_{d-2} \dots a_1 1 00}$, we have $v(x, c_1, \dots, c_{2n}) = h_v(x)$.
+    \end{itemize}
+
+    \paragraph{$\V$ has a mistake bound of $d$ in the realizable case} This can be shown by presenting a learner with mistake bound $d$. A learner can independent of input use certificate debates along the "path" that encodes the ground truth hypothesis. That is, in the first ground, the learner will use debate $c_1^1 = \dots = c_{2n}^1 = \overline{100}$ and an arbitrary label $\hat{y}_0$ and receive output $a_1 : = v^* (x_1, c_1^1, \dots, c_{2n}^1)$. Then, in any subsequent round $t \leq d-1$, the learner will predict an arbitrary label and use the debate with $c_{1}^t = \dots = c_{2n}^t  = \overline{a_{t-1} a_{t-2} \dots a_1 1 0 0}$ and receive label $a_{t} : = v^*(x_t,c_1^t, \dots, c_{2n}^t )$. 
+ Then, in round $t = d $ the learner will use the debate with $c_{1}^d = \dots = c_{2n}^d  = \overline{a_{d-1} a_{d-2} \dots a_1 1 0 0}$ and receive label $y^* : = v^*(x_t,c_1^d, \dots, c_{2n}^d )$.
+ In every round $t > d$, the learner will then predict $\hat{y}_t= y^*$. According to the construction $y^* = h(x)$ for all $x\in \X$. Thus, this learner will make at most $d$ mistakes in the realizable case (and therefore  $\dldim(\V) \leq d$.)
+\newcommand{\fat}{\textrm{fat}}
+\paragraph{k-non-realizable case} We will argue that for every learner and there exists a $k$-non-realizable sequence sequence of $T= k\cdot d$ rounds, in which the learner is forced to make a mistake in at least half of the rounds. 
+For this consider the following adversary behaviour: 
+\begin{itemize}
+    \item In every round $t$, present arbitrary $x_t \in \X$ and every $\bm{c} \in \C^{2n}$, output $\tilde{y}_{t} = 1$.
+\end{itemize}
+We will argue that independent of the learners behaviour, the resulting sequence is $k$-consistent with a verifier $v^* \in \V$ such that $\sum_{t=1}^T \indct[h_{v^*}(x) \neq \hat{y}_t] \geq T/2$.
+%In order to prove this, it is sufficient to  show that for every set of debates $\bm{c}^1: =(c_1^1, \dots c_{2n}^1), \dots, \bm{c^T} = (c_1^T, \dots c_{2n}^T)$ and every verifier $v^* \in \V$, there exists an alternate verifier $v' \in \V$, such for at most $k$ rounds $i_1 \dots, i_k$, we have $v'(x_1,\bm{c}^{i_1} ) \neq v^*(x_1,\bm{c}^{i_`} ), \dots, v'(x_{i_k},\bm{c}^{i_k} ) \neq v^*(x_k,\bm{c}^{i_K} )$ but for all $x\in \X$, $h_{v^*}(x) \neq h_{v'}(x) $. If this is the case, then any learner that succeeds on $v^*$ (in every round) will fail on $v'$ in the $k$-non-realizable case. 
+%We will now show that indeed, for every set of debates $\bm{c}^1: =(c_1^1, \dots c_{2n}^1), \dots, \bm{c^T} = (c_1^T, \dots c_{2n}^T)$ and every verifier $v^* \in \V$, there exists an alternate verifier $v' \in \V$, such for at most $k$ rounds $i_1 \dots, i_k$, we have $v'(x_1,\bm{c}^{i_1} ) \neq v^*(x_1,\bm{c}^{i_`} ), \dots, v'(x_{i_k},\bm{c}^{i_k} ) \neq v^*(x_k,\bm{c}^{i_K} )$ but for all $x\in \X$, $h_{v^*}(x) \neq h_{v'}(x) $.
+%First we note that 
+ 
 \end{proof}
-\ruth{I don't understand the example.. can you explain the idea of the constriuction in words also? I suspect there are some typos in the four points with all the quantifiers, eg in the first point it says $\forall c_1, c_2 = 1$, in the third point, there should be a ``for all'' quantification for the $c_2$s? The last point doesn't seem to conclude.. But either way, I think it would be good to explain more.}
+\ruth{I don't understand the example.. can you explain the idea of the construction in words also? I suspect there are some typos in the four points with all the quantifiers, eg in the first point it says $\forall c_1, c_2 = 1$, in the third point, there should be a ``for all'' quantification for the $c_2$s? The last point doesn't seem to conclude.. But either way, I think it would be good to explain more.}
 
-\section{The Combative Case}
 
-\section{A separation between cooperative and combative learning}
-\label{sec:cooperative-example}
-\input{cooperative-example}
-
-\section{A separation between unrealizable and realizable learning}
-\label{sec:agnostic-example}
-\input{agnostic-example}
 
 % Authors are strongly encouraged to include an anonymous AI Disclosure section
 % if generative AI was used substantively. Uncomment and replace the example:
@@ -429,11 +608,52 @@ automatically hides this text.}
 
 \section{Deferred proofs}
 
-Here is the proof of the main lemma from the paper body.
+\begin{lemma}\label{lem:equilibrium}
+    Let $\pi_\ct$ be the strategy of \dt out of all potential strategies $\Pi_\ct$ and let $\pi_\cf$ be the strategy of \df out of all potential strategies $\Pi_\cf$. Assume that the debate protocol runs for $T$ steps. Let $a$ be the strategy of the environment out of all possible strategies $A$. 
+    Let $\tLo(a, \pi,\pi'), \fLo(a,\pi,\pi')$ be the losses of $\dt,\df$ respectively when the environment runs $a$, \dt runs $\pi$ and \df runs $\pi'$. 
+    Suppose that 
+    \begin{align*}
+            &\pi_\ct \in \argmin_{\pi \in \Pi_\ct} \max_{a \in A} \tLo(a,\pi,\pi_\cf)\text{     and }
+    \pi_\cf \in \argmin_{\pi \in \Pi_\cf} \max_{a \in A} \fLo(a,\pi_\ct,\pi).
+    \end{align*}
+    Then 
+    \[
+   \tLo(\pi_\ct, \pi_\cf)
+    = \min_{\pi \in \Pi_\ct}\max_{\pi'\in \Pi_\cf}\tLo(\pi,\pi')
+\quad \text{ and }\quad
+\fLo(\pi_\ct, \pi_\cf)
+ =    \min_{\pi' \in \Pi_\cf}\max_{\pi\in \Pi_\ct}\fLo(\pi,\pi').
+    \]
+    It follows that debaters that minimize their loss with respect to a worst-case opposing debater and worst-case environment are worst-case optimal also against a fixed opposing debater that minimizes its loss in the same way. 
+\end{lemma}
+\begin{proof}
+    This claim follows because $\tLo = T-\fLo$, by a direct application of the saddle-point 
+sufficiency condition \cite[see, e.g.,][]{boyd2004convex}. Let $\tLo(\pi,\pi') = \max_{a \in A} \tLo(a,\pi,\pi')$ and $\fLo(\pi,\pi') = \max_{a \in A} \fLo(a,\pi,\pi')$. For any $\pi \in \Pi_\ct,\pi' \in \Pi_\cf$, we have by the assumption that 
 
-\begin{proofof}{Theorem 1}
-  Follows from the concavity of $\ln(\cdot)$ and Jensen's inequality.
-\end{proofof}
+\[
+\tLo(\pi_\ct, \pi') =
+    T - \fLo(\pi_\ct, \pi')
+    \leq 
+    T - \fLo(\pi_\ct, \pi_\cf)
+    \leq \tLo(\pi_\ct, \pi_\cf)
+    \leq \tLo(\pi, \pi_\cf).
+\]
+Hence, by the saddle-point 
+sufficiency condition,
+\[
+   \tLo(\pi_\ct, \pi_\cf)
+    = \min_{\pi \in \Pi_\ct}\max_{\pi'\in \Pi_\cf}\tLo(\pi,\pi')
+\]
+Symmetrically,
+\[
+\fLo(\pi_\ct, \pi_\cf)
+ =    \min_{\pi' \in \Pi_\cf}\max_{\pi\in \Pi_\ct}\fLo(\pi,\pi').
+    \]
+\end{proof}
+
+
+
+
 
 
 
