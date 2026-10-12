@@ -1,8 +1,7 @@
 \sivan{this should come before the more elaborate $\Omega(kd)$ example. Also emphasize this is a randomized solution}
 We now give a verifier class that is easy to learn in the realizable cooperative case (with randomized debaters), but not when there are misspecifications.
-\sivan{TODO: does this only work in the cooperative case?}
 \begin{theorem}
-There is a verifier class $\V$ with the following two properties. In the realizable case, \dt cooperative debaters \sivan{??} has a randomized strategy that obtains $\ex[\Mi(T)]<9$ for every $T$, every $v^*\in\V$, every sequence of input instances \sivan{and every strategy of \df?}. In the unrealizable case, for every $k\ge1$ and every $T\ge 3k$, the environment 
+There is a verifier class $\V$ with the following two properties. In the realizable case with cooperative debaters there is a randomized strategy that obtains $\ex[\Mi(T)]<9$ for every $T$, every $v^*\in\V$ and every sequence of input instances. In the unrealizable case, for every $k\ge1$ and every $T\ge 3k$, the environment 
 can choose the inputs and draw $v^*\in\V$ and the misspecified rounds at random in advance, so that the expected number of misspecified rounds is $k$ and every strategy of the debaters has $\ex[\Mi(T)]\ge\frac32k$.
 \end{theorem}
 \begin{proof}
@@ -29,8 +28,6 @@ Let $\V=\{v_{b,e}:b\in\{0,1\},\ e:\X\to \C\times\C$\}.
 Clearly, for any $b,e$, $v_{b,e}$ validates $h_b$, using the $p$ that gives $b$ for any $r$. %The exceptional entry, if there is one, lies in a single row, so the other row is all $b$. No row is all $1-b$, because that would need two entries that differ from $b$. So the \dt has a certificate that forces the label $b$ and none that forces $1-b$. Hence $h_{v_{b,e}}=h_b$, and $\H_\V=\H$.
 Next, we give a randomized strategy for learning $h^*$ in the realizable case. Fix $v^*\in\V$ and a sequence of inputs, and let $h^*=h_{v^*}=h_b$. 
 
-\sivan{I Think this could work for opposing ones but need to think about it ... if an instance appears for the first time in this sequence, \dt proposes as a label the majority of the earlier feedback $\vy_1,\ldots,\vy_{t-1}$, and chooses its certificate/argument uniformly and independently. Otherwise, XXXXXXXXXXXXxx Since each table of $v^*$ has at most one entry equal to $1-b$,
-the probability that the response is $1-b$ is either $1/2$ }
 
 In each round, both \dt and \df choose their arguments $\ct,\cf$ uniformly and independently. \dt proposes as a label the majority of the earlier feedback $\vy_1,\ldots,\vy_{t-1}$, breaking ties arbitrarily. 
 The values $\vy_t$ are independent, and each value equals $b$ with probability $3/4$. After $s$ rounds, the majority is wrong only if at most $s/2$ of the $s$ values equal $b$, while their expected number is $3s/4$. By Hoeffding's inequality, this has probability at most $e^{-2(s/4)^2/s}=e^{-s/8}$. Summing over rounds gives $\ex[\Mi(T)]\le\sum_{s\ge0}e^{-s/8}=1/(1-e^{-1/8})<9$. 
