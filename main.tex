@@ -133,12 +133,12 @@ A run of the debate protocol is evaluated through the \emph{number of mistakes} 
 \end{align*}
 
 We can consider \dt and \df that can be cooperative, with the joint goal to minimize $\Mi(T)$. 
-In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity \ruth{that we also sometimes refer to as \emph{the learner} in this case}.
+In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity that we also sometimes refer to as \emph{the learner} in this case.
 
 
 
 
-In contrast, a standard approach for using debate \ruth{as a learning strategy, }considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
+In contrast, a standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
 We formalize this by defining a loss\vinayak{are there previous works that formalize it this way? (sivan)}~\vinayak{yes this is the standard loss function used in the literature. Often it's somewhat more general because the verifier gives a score, which can be a fraction, that judges how well does the debate transcript prove that the true label of $x$ is $\hat{y}$}\sivan{In this case we need a reference} for each debater. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
 \begin{align*}
  \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].
@@ -228,11 +228,11 @@ We define the \emph{depth} of subtree $\T^\alpha$ with respect to verifier class
 % \]
 
 Note that the depth of a subtree rooted at $\alpha$ counts the number of (past and future) mistakes that the debate could incur with verifiers that are consistent with the path up to $\alpha$.
-The use of past mistakes in the depth of a subtree is crucial: because the learner (the debaters) never directly finds out the true  labels $y_t$, it must keep track of all consistent hypotheses and its mistakes with respect to them throughout the run.
+The use of past mistakes in the depth of a subtree is crucial: because the learner (the debaters) never directly finds out the true  labels $\ty_t$, it must keep track of all consistent hypotheses and its mistakes with respect to them throughout the run.
 % \ruth{good to add this sentence, but notation with index $t$ not introduced here, would replace with ``true label $y^*$''}\sivan{we introduce $y_t$ in the debate protocol above}\ruth{true :)}
 The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that is $\depth(\T) = \depth(\T^\rho)$. Note that at the root node, there is no past, and thus only future mistakes are counted:
 \[
-\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{q\in P^\rho}~ \max_{h\in \H_\V \cap \H_q}~  ( \mi(h, p_\alpha) + \mi(h, q) )  = \min_{q\in P^\rho}~ \max_{h\in \H_{q}}~    \mi(h, q).
+\depth(\T,\V) = \depth(\T^\rho,\V) = \min_{q\in P^\rho}~ \max_{h\in \H_\V \cap \H_q}~  ( \mi(h, p_\rho) + \mi(h, q) )  = \min_{q\in P^\rho}~ \max_{h\in \H_{q}}~    \mi(h, q).
 \]
 
 % \[
@@ -242,24 +242,24 @@ The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that i
 % \ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
 With this, we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
 \begin{definition}[Debate Littlestone Dimension]
- Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length.\sivan{does it really make sense to use Littlestone in the name? except the fact that it's a tree it's not really related} The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
+ Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length.\sivan{does it really make sense to use Littlestone in the name? except the fact that it's a tree it's not really related}\ruth{I feel like I have seen various something-Littlestone-dimensions, for different online learning settings, so thought this is standard naming; I'd keep it, but I also don't feel strongly about it; Vinayak? Tosca?}\sivan{I have only seen it for actual online learning dimensions (e.g. the randomized littlestone dimension which is for online learning, not another protocol)} The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
  \[
   \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V).
  \]
 If the length $n$ is fixed (or clear from context) we will also use the shorthand notation $\dldim(\V) =   \dldim(\V, n)$.
 \end{definition}
-We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with a finite mistake bound. Moreover, the optimal mistake for learning $\H$ through access to $\V$ is exactly the debate Littlestone dimension of $\V$.
-\sivan{it would be stronger to say that the optimal mistake bound is exactly the dimension}\ruth{added a sentence above}\sivan{but don't we want this in the theorem? By the way, the theorem is  missing a proof}
+We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with a finite mistake bound. 
 
 \begin{theorem}
 Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if the learner has access to a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
+Moreover, the optimal mistake bound for learning $\H$ through access to $\V$ is exactly $\dldim(\V, n)$, the length-$n$-debate Littlestone dimension of $\V$.\ruth{need to add finiteness of $\C$, unless we make it a global assumption in the paper}
 \end{theorem}
 % \ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
 % \sivan{I don't think this holds. You could have a verifier class that reveals H exactly using "hidden" values, while another class does not. I'm not sure if we need a dimention for H though}\ruth{ok, removing the comment}
 We start by showing that the debate Littlestone dimension induces a lower bound on the number of mistakes that the environment can enforce.
 
 \begin{lemma}
-Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, for any deterministic choices of the debaters in the debate protocol with verifier class $\V$, the environment can enforce $d$ mistakes within finitely many rounds.
+Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, for any deterministic choices of the debaters in the debate protocol with verifier class $\V$, the environment can enforce $d$ mistakes within finitely many rounds.\ruth{Should debaters being deterministic be a condition for the whole section? Or also added to above theorem?}\sivan{no because some results/discussions relate to randomized ones and it would be hard to follow which section assumes what}
 % \begin{align*}
 %  \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t] \geq d
 % \end{align*}
@@ -272,7 +272,7 @@ From the definition of depth
 \[
 \depth(\T,\V) =  \min_{p\in P^\rho}~  \max_{h\in \H_p}~ \mi(h, p)
 \]
-it follows that for any $p \in P^\rho$, there is some $h$ that induces $d$ mistakes. Let $t_p$ be the round after which this $h$ has induced $d$ mistakes in path $p$. Note that every $p$ in $\T$ is finite, and the fan-out of the tree $\T$ is finite (since $\C$ is finite). Hence, 
+it follows that for any $p \in P^\rho$, there is some $h$ that induces $d$ mistakes. Let $t_p$ denote the round after which this $h$ has induced $d$ mistakes in path $p$. Note that every $p$ in $\T$ is finite, and the fan-out of the tree $\T$ is finite (since $\C$ is finite). Hence, 
 $\max_{p\in P^\rho} t_p$ is some $b \in \naturals$. 
 It follows that for any sequence of outputs chosen by the learner, the environment has verifier responses and a consistent choice of $h$ that enforce $d$ mistakes in at most $b$ steps. 
 
@@ -287,48 +287,35 @@ implies that there is uniform upper bound $b < \infty$, such that the $d$ mistak
 % \ruth{For trees: there does not exist a tree with finite fan-out and arbitrarily long paths, that does not also have an infinite path. But with infinite fan-out this is not true, one can have a node with finite paths of every length starting at that node... }
 \end{proof}
 
-For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol is now in round $t$, and let \sout{$q$} \sivan{$p_t$} be the path (of a debate tree) recording the previous rounds. Letting $x_t,\hy_t,\sc_t,\vy_t$ be the record of round $t$, we define $p_t$ to include $x_t$ but not $\hy_t,\sc_t,\vy_t$.\ruth{should this be $\vy_{t+1}$? or do we let the indices of the $x$ and $\vy$ in a node in the tree be different?}\sivan{yes they are different, $\vy_t$ corresponds to the response to $\hy_t$ and the same node includes the next example which is $x_{t+1}$. }
+For the upper bound, we define the Standard Optimal Algorithm (SOA) for the length-$n$-debate protocol. Assume that the debate protocol is now in round $t$, and let $p_t$ be the path (of a debate tree) recording the previous rounds. Letting $x_t,\hy_t,\sc_t,\vy_t$ be the record of round $t$, we define $p_t$ to include $x_t$ but not $\hy_t,\sc_t,\vy_t$.
+% \ruth{should this be $\vy_{t+1}$? or do we let the indices of the $x$ and $\vy$ in a node in the tree be different?}\sivan{yes they are different, $\vy_t$ corresponds to the response to $\hy_t$ and the same node includes the next example which is $x_{t+1}$. }
 
 
-Then the current verifier version space is \sout{$\V_q$} \sivan{$\V_{p_t}$}. An optimal learner needs to take the action $(\hy, \sc)$ that minimizes the maximal number of mistakes the environment will be able to enforce. The environment can enforce mistakes by combining past mistakes that happened on \sout{$q$}\sivan{$p_t$} with future mistakes that may happen in a debate tree from this point on \emph{through the same function $h$}. Thus, our learner chooses $(\hy, \sc)$ that minimizes
-\sout{
-%\[
-$Q = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})} ~\min_{p\in\T^\rho} ~\max_{h\in \H_p\cap \H_{(q,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,q)),$
-%\]
-}
-\sivan{
+Then the current verifier version space is $\V_{p_t}$. 
+An optimal learner needs to take the action $(\hy, \sc)$ that minimizes the maximal number of mistakes the environment will be able to enforce. The environment can enforce mistakes by combining past mistakes that happened on $p_t$ with future mistakes that may happen in a debate tree from this point on \emph{through the same function $h$}.
+Thus, the learner chooses a pair $(\hy, \sc)$ in $\argmin_{\hy, \sc}Q_t(\hy, \sc)$ for
+
+% Thus, our learner chooses $(\hy, \sc)$ that minimizes
+% \sout{
+% %\[
+% $Q = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})} ~\min_{p\in\T^\rho} ~\max_{h\in \H_p\cap \H_{(q,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,q)),$
+% %\]
+% }
+% \sivan{
 \[
 Q_t(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q) +\indct[h(x_t) \neq \hy]),
 \]
-The learner chooses a pair in $\argmin_{\hy, \sc}Q_t(\hy, \sc)$.
-}
-
-
-
-
-where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. Note that for the version spaces defined through this expanded path, the domain point component $x_{t+1}$ of the  environment response is not relevant, and we this omit it here to not overload the notation.
+% }
+where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. 
+Note that for the version spaces defined through this expanded path, the domain point component $x_{t+1}$ of the  environment response is not relevant, and we this omit it here to not overload the notation.
 
 \begin{lemma}
- Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) \in \naturals$. Then, at every step $t$ of the SOA learner above, \sivan{$\min_{\hy,\sc} Q_t(\hy,\sc) \leq \dldim(\V, n)$. }
-  \sout{the quantity $Q$ above is bounded by the debate Littlestone dimension }
-  \sivan{Moreover, $\dldim(\V, n)$ is also an upper bound on the total number of mistakes that the SOA learner makes during the run.}
+ Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) \in \naturals$. Then, at every step $t$ of the SOA learner above, $\min_{\hy,\sc} Q_t(\hy,\sc) \leq \dldim(\V, n)$. 
+  Moreover, $\dldim(\V, n)$ is also an upper bound on the total number of mistakes that the SOA learner makes during the run.
 \end{lemma}
 \begin{proof}
-\iffalse
-Let $\T^w$ be a (worst case) debate tree for the class $\V$ of depth $d$. Since at each node, there is an outgoing edge for each possible  action $(\hy, \sc)$ of the learner, the environment can use the responses in $\T^w$ to ensure that the debaters will suffer at least $d$ mistakes, independently of their choices.
-
-On the other hand, if there existed a step (ie node $\alpha$ in $\T$), where the quantity $Q$ was larger than $d$, this implies that for all possible learner actions $(\hy, \sc)$, there existed a choice $\vy$ for the verifier such that there existed a tree $\T\in\Delta_n(\V_{(q,\hy, \sc, \vy)})$ with 
-\[
-~\min_{p\in\T^\rho} ~\max_{h\in \H_{p_\alpha}\cap \H_{(p_\alpha,\hy, \sc, \vy)}} (\mi(h, p) + \mi(h,p_\alpha)) > d
-\]
-Thus, this choice $\vy$ would be instantiated in the worst case tree $\T^w$ and thus the tree $\T^w$ has a node $\alpha$ with  $\depth(\T^\alpha, \V) > d$, a contraction to the lemma below.
-\fi
-
-
-\sivan{ New proof below}:
-
 For an instance $x$, define the set of trees $\Delta_n(\V,x)$ to be the set of trees in $\Delta_n(\V)$ that have $x$ at the root.
-Define the set of trees $\Delta_n(\V,x,\hy,\sc)$ to be the set of trees that result from taking any tree from $\Delta_n(\V,x)$ and removing all the edges coming out of $x$ except the one labeled $\hy,\sc$. 
+Define the set of trees $\Delta_n(\V,x,\hy,\sc)$ to be the set of trees that result from taking any tree from $\Delta_n(\V,x)$ and removing all the edges (and corresponding sub-trees) coming out of $x$ except the one labeled $\hy,\sc$. 
 
 First, we show that $\min_{\hy,\sc}Q_t(\hy,\sc)$ is non increasing in $t$. Consider a round $t$ in some run of SOA. We have
 \begin{align*}
@@ -336,11 +323,11 @@ First, we show that $\min_{\hy,\sc}Q_t(\hy,\sc)$ is non increasing in $t$. Consi
   &\leq
     \min_{\hy,\sc}  ~\sup_{\T\in\Delta_n(\V_{p_t},x_t,\hy,\sc)} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))
 \end{align*}
-Denote $f(q) := \max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))$.
-Let 
+For a path $q\in\T^\rho$, denote $f(q) := \max_{h\in \H_{p_t}\cap \H_q} (\mi(h, p_t) + \mi(h,q))$, and let
 \[
 q_\T \in \argmin_{q\in\T^\rho} f(q).
 \]
+denote the path in tree $\T$ that minimizes the sum of mistakes an $h$ can incur in $q_\T$ and $p_t$ combined.
 Note that if $\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)$ then $q_\T$ must start with $(x_t,\hy,\sc)$. Let $q'_\T$ be the rest of the path of $q_\T$ and write $q_\T = (x_t,\hy,\sc);q'_\T$. 
 Then we have 
 \begin{align*}
@@ -351,7 +338,7 @@ Then we have
 
 Define $\T_{\hy,\sc} \in \argmax_{\T \in \Delta_n(\V_{p_t},x_t,\hy,\sc)}f((x_t,\hy,\sc);q'_\T)$ (if a maximum exists)\footnote{A similar argument can be made if there is no maximum, by using a sequence of $\T_{\hy,\sc}$ choices that are larger than a sequence converging to the supremum}
 and let $\T^*$ be the tree constructed by joining each of the trees $\T_{\hy,\sc}$ at the root $x_t$. Note that $\T^* \in \Delta_n(\V_{p_t},x_t)$. Let $X_{\hy,\sc}$ be the set of paths that start with $(x_t, \hy,\sc)$.
-
+Then
 \[
 \min_{q \in (\T^*)^\rho} f(q) = \min_{\hy,\sc} \min_{q \in \T^*\cap X_{\hy,\sc}} f(q) = \min_{\hy,\sc}f((x_t,\hy,\sc);q'_{\T_{\hy,\sc}}) = R.
 \]
@@ -491,7 +478,7 @@ The strategy works as follows:
         \item Set $\sc_t$ to the certificate $\sc$ suggested by one of the copies $i_t$, where $i_t$ selected uniformly at random from $[4k]$. Get $\vy_t$ and feed it to the same copy.
     \end{itemize}
 \end{itemize}
-Call a copy ``uncorrupted at time $t$'' if it has not been provided with a corrupted feedback until round $t$. Since there can be at most $k$ misspecified rounds, at least $3k$ copies are uncorrupted at each time $t$. For round $t$, let $M_t = \indct[\hy_t \neq y_t]$. Let $\hy_t^i$ be the label proposed by copy $i$ at round $t$, and define $Z_t = \indct[\hy_t^{i_t} \neq y_t \wedge i_t \text{ is uncorrupted at time }$t$]$. Any copy $i_t$ can make at most $d$ mistakes as long as it is uncorrupted. Hence, $\sum_t Z_t \leq 4kd$. On the other hand, if $M_t = 1$, then at least $2k$ copies $i$ have $\hy_t^{i} \neq y_t$ in round $t$, and at least $k$ of these are uncorrupted at time $t$. 
+Call a copy ``uncorrupted at time $t$'' if it has not been provided with a corrupted feedback until round $t$. Since there can be at most $k$ misspecified rounds, at least $3k$ copies are uncorrupted at each time $t$. For round $t$, let $M_t = \indct[\hy_t \neq y_t]$. Let $\hy_t^i$ be the label proposed by copy $i$ at round $t$, and define $Z_t = \indct[\hy_t^{i_t} \neq y_t \wedge i_t \text{ is uncorrupted at time }$t$]$. Any copy $i_t$ can make at most $d$ mistakes in rounds in which its copy is updated, as long as it is uncorrupted. Hence, $\sum_t Z_t \leq 4kd$. On the other hand, if $M_t = 1$, then at least $2k$ copies $i$ have $\hy_t^{i} \neq y_t$ in round $t$, and at least $k$ of these are uncorrupted at time $t$. 
 Therefore, for any history $H_t$ of the run until round $t$, $\Pr(Z_t = 1 \mid M_t = 1, H_t) \geq 1/4$. 
 Thus,
 \[
