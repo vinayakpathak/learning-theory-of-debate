@@ -66,7 +66,6 @@
 \section{Related Work}
 
 \vinayak{works on rich feedback/interactive learning protocols including DFF}
-\sivan{cite DFF where needed}
 \input{related-work}
 
 \section{Formal Setup}
@@ -256,25 +255,25 @@ The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that i
 % \]
 %
 % \ruth{there is an issue right now, since we cannot allow the minimum just choose a short path... need to take min over all ``maximally consistent'' paths.. so will need more notation..}
-With this, we are ready to define the \emph{debate Littlestone dimension} for debate length $n$ of a verifier class:
-\begin{definition}[Debate Littlestone Dimension]
- Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length.\sivan{does it really make sense to use Littlestone in the name? except the fact that it's a tree it's not really related}\ruth{I feel like I have seen various something-Littlestone-dimensions, for different online learning settings, so thought this is standard naming; I'd keep it, but I also don't feel strongly about it; Vinayak? Tosca?}\sivan{I have only seen it for actual online learning dimensions (e.g. the randomized littlestone dimension which is for online learning, not another protocol)} The \emph{length-$n$-debate Littlestone dimension} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
+With this, we are ready to define the \emph{\debatedimname}\sivan{it's a macro now, change if you want} for debate length $n$ of a verifier class:
+\begin{definition}[\debatedimname]
+ Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-\debatedimname} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree of length $n$:
  \[
   \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V).
  \]
 If the length $n$ is fixed (or clear from context) we will also use the shorthand notation $\dldim(\V) =   \dldim(\V, n)$.
 \end{definition}
-We will show that the debate Littlestone dimension characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with a finite mistake bound. 
+We will show that the \debatedimname characterizes when a hypothesis class $\H$ that is supported by a verifier class $\V$ is learnable via debate with a finite mistake bound. 
 
 \begin{theorem}
 Let $\H\subseteq \Y^\X$ be some hypothesis class. Then $\H$ is learnable from length-$n$-debate with finite mistake bound if and only if the learner has access to a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) <\infty$.
-Moreover, the optimal mistake bound for learning $\H$ through access to $\V$ is exactly $\dldim(\V, n)$, the length-$n$-debate Littlestone dimension of $\V$.\ruth{need to add finiteness of $\C$, unless we make it a global assumption in the paper}
+Moreover, the optimal mistake bound for learning $\H$ through access to $\V$ is exactly $\dldim(\V, n)$, the length-$n$-\debatedimname of $\V$.\ruth{need to add finiteness of $\C$, unless we make it a global assumption in the paper}
 \end{theorem}
 % \ruth{Maybe, for a given hypothesis class, the dldim for all supporting verifier classes is equal? Not sure right now, so phrasing it as above..If we have the same dimension for all supporting verifier classes, we could also define the dldim(H); otherwise, we should define it as inf over all supporting verifier classes..need to think through}
 % \sivan{I don't think this holds. You could have a verifier class that reveals H exactly using "hidden" values, while another class does not. I'm not sure if we need a dimention for H though}\ruth{ok, removing the comment}
 
 The theorem follows directly from the subsequent two lemmas in this section. Lemma \ref{lemma:cooperative_deterministic_lowerbound} shows that our dimension lower bounds the optimal mistake bound, while Lemma \ref{lemma:cooperative_deterministic_upperbound} provides the corresponding upper bound.
-We start by showing that the debate Littlestone dimension induces a lower bound on the number of mistakes that the environment can enforce.
+We start by showing that the \debatedimname induces a lower bound on the number of mistakes that the environment can enforce.
 
 \begin{lemma}\label{lemma:cooperative_deterministic_lowerbound}
 Let $\C$ be a finite certificate class. Let $\H\subseteq \Y^\X$ be some hypothesis class, for which there exists a verifier class $\V$ with $\H = \H_\V$ and $\dldim(\V, n) = d \in \naturals$. Then, for any deterministic choices of the debaters in the debate protocol with verifier class $\V$, the environment can enforce $d$ mistakes within finitely many rounds.\ruth{Should debaters being deterministic be a condition for the whole section? Or also added to above theorem?}\sivan{no because some results/discussions relate to randomized ones and it would be hard to follow which section assumes what}\ruth{ok, then we add the condition just to the theorem and two lemmas in this part?}\sivan{we should add it wherever it is used I guess. Everything that relies on trees uses it}
@@ -428,7 +427,7 @@ The first inequality follows by the realizability assumption, which implies that
 \section{Oppositional debaters}
 \label{sec:oppositional}
 
-\section{\sivan{temp}}
+\subsection{\sivan{temp}}
 
 We show that even if each debater optimizes its worst-case loss against worst-case environment and opposing debater, this does not provide helpful guarantees for learning. 
 First, we observe that for \dt, this optimization criterion is  meaningless, since all \dt strategies are optimal according to this criterion. 
@@ -444,11 +443,10 @@ For this sequence, any response of \df has $\hy_t = \vy_t$. Hence \df incurs a l
 In addition, we show that the loss of \dt cannot be used to upper bound the debate protocol mistakes $\Mi(T)$, even if both debaters are worst-case optimal with respect to their loss as indicated above. In contrast, if the debaters are worst-case optimal with respect to their \emph{regret}, then according to the bound \todo{ref} these regrets upper bound $\Mi(T)$. In the same example, we show that $\Mi(T)$ is large under the loss optimization scenario but small under the regret optimization scenario. 
 \begin{theorem}
     There is a verifier class $\V$ such that \todo{loss-optimizing} debaters lead to 
-    $\Mi(T) \geq T/2$ while $\tLo(T) = \todo{Xxx}$. On the other hand, \todo{regret-optimizing} debaters lead to $\Mi(T) \leq \todo{xxx}$
+    $\ex[\Mi(T)] \geq T/4$ while for all sequences, $\tLo(T) \leq 1.5$. On the other hand, \todo{regret-optimizing} debaters lead to $\Mi(T) \leq 1.5$.
 \end{theorem}
 \begin{proof}
-
-Consider \todo{an infinite $\X$} and $\C = \{0,1\}$. Consider $\H = \{h_0,h_1\}$, where $h_b(x) = b$ for all $x\in \mathcal{X}, b\in\{0,1\}$. Let $\V$ be the class of all verifiers $\{ v_{b,c} \mid b,c \in \{0,1\}\}$  such that $\forall \cf \in \C, v_{b,c}(x,c,\cf) = b$, and for $1-c$ we have $v_{b,c}(x,1-c,\cf) = \cf$ for $\cf \in \C$, as illustrated below.
+Let $\X = \{x\}$ and $\C = \{0,1\}$. Let $\H = \{h_0,h_1\}$, where $h_b(x) = b$ for  $b\in\{0,1\}$. Let $\V$ be the class of all verifiers $\{ v_{b,c} \mid b,c \in \{0,1\}\}$  such that $\forall \cf \in \C, v_{b,c}(x,c,\cf) = b$, and for $1-c$ we have $v_{b,c}(x,1-c,\cf) = \cf$ for $\cf \in \C$, as illustrated below.
 \[
 \begin{array}{c|cc}
  v_{b,c}(x,\ct,\cf) & \cf=0 & \cf=1\\
@@ -459,48 +457,21 @@ Consider \todo{an infinite $\X$} and $\C = \{0,1\}$. Consider $\H = \{h_0,h_1\}$
 \]
 Note that $v_{b,c}$ verifies $h_b$. 
 
-First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$. In each round, it selects $\hy,\ct$ uniformly at random from the set of active pairs. If it incurs a loss using some pair, it removes this pair from the active set. If it does not incur a loss using some pair, it continues to use it in subsequent rounds. 
+First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$. In the first round, it selects $\hy,\ct$ uniformly at random from the set of active pairs. In each round, if it incurs a loss using some pair, it removes this pair from the active set and selects another pair for the next round uniformly at random. If it does not incur a loss using in a round, it continues to use the same pair in the next round. 
 
-Whenever \df proposes some $\hy$ and $\ct$ for some $x \in \X$ and incurs a loss with some \dt certificate $\cf$, this means that 
-$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. Hence, the loss incurred by this strategy is equal to the expected number of pairs it tries before 
+To see that this is worst-case optimal, observe that whenever \df proposes some $\hy$ and $\ct$ for some $x \in \X$ and incurs a loss with some \dt certificate $\cf$, this means that 
+$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. Hence, this \df strategy only incurs a loss at most once for every pair until selecting $b^*, c^*$. The expected number of pair selections before selecting this pair is $1.5$, hence the expected loss of $\df$ is at most $1.5$. This is worst-case optimal, since any strategy that does not replace a pair that has incurred a loss will incur the loss again in the next round against a worst-case \df, thus its worst-case loss cannot be smaller.
 
+Moreover, let $r$ be the last round before $b^*,c^*$ is found, then using this \df strategy we get $\Mi(T) \leq r$, since no prediction mistake is made after this round. However, the value of $r$ depends on the strategy of \dt, as we now show.
 
-Hence, since \dt minimizes its worst-case loss (regret), it will not use a pair on which it incurred a loss. Moreover, if it does not incur a loss in a given round with some $\hy,\ct$, it must continue to use this pair, since it $\hy,\ct$
+First, consider the optimal \dt according to loss minimization. As shown in Claim~\ref{claim:deb2}, all \dt strategies are optimal with respect to worst-case loss minimization. In particular, consider the strategy that in every round, upon observing $(x_t, \ct_t, \hy_t)$, selects the response $\cf_t = \hy_t$. Under this strategy, if $\ct_t = 1-c^*$, then $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,\hy_t) = \hy_t$. Therefore, when the optimal \dt strategy described above is used, if in the first round \dt selects $(\hy,\ct) = (1-b^*,1-c^*)$, it incurs no loss and does not change its strategy for the rest of the run, never trying $b^*, c^*$, and incurring a prediction mistake in every round. The probability that \df tries $(\hy,\ct) = (1-b^*,1-c^*)$ in the first round is $1/4$. Hence, using these two debaters leads to $\ex[\Mi(T)] \geq T/4$.
 
-After at most $3$ rounds in which loss is incurred for \df, only one pair remains, which must be $b^*,c^*$. In this case, an optimal \df must use this pair for all subsequent rounds. It is easy to see that this strategy is optimal for \dt, since no strategy can guarantee $\tLo(T) < 3$ against a worst-case \df.
-Moreover, let $r$ be the round after which one pair remains, then $\Mi(T) \leq r$ since no prediction mistake is made after this round. 
+Second, consider the optimal \dt according to regret minimization. Consider the following strategy: In every round, \dt selects $\cf_t = 1-\hy_t$. Then, if $\ct_t = 1-c^*$, we have $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,1-\hy_t) \neq \hy_t$ and \df does not incur a loss. If  $\ct_t = c^*$, then this is an unachievable round \sivan{define}, hence \df may incur a loss but it does not accumulate regret. Thus, this strategy obtains zero regret and so it is optimal with respect to regret minimization. 
 
-Now, consider the optimal \dt according to loss minimization. As shown in Claim~\ref{claim:deb2}, all \dt strategies are optimal with respect to loss minimization. In particular, consider the strategy that in every round, upon observing $(x_t, \ct_t, \hy_t)$, selects the response $\cf_t = \hy_t$. Under this strategy, if $\ct_t = 1-c^*$, then $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,\hy_t) = \hy_t$.
-
+Using this strategy against the optimal \dt strategy described above leads to \dt incurring a loss with every pair except for $(\hy,\ct) = (b^*,c^*)$. Therefore, the expected number of rounds until it tries $(\hy,\ct) = (b^*,c^*)$ is $1.5$, leading to $\Mi(T) \leq 1.5$. This can also be derived from the \todo{ref regret upper bound}.
 \end{proof}
 
  
-
-Let $\V$ be a verifier class with $h_0,h_1$, in each round debater 2 does not refute (it's possible because all debater 2's are optimal). 
-Every time debater 1 predicts some $\hy_t$ with $\ct$ 
-
-$H=\{h_0,h_1\}$, $\C = [n]$. one $\ct \in \C$ for all $x$ is a winning certificate.
-For the other $\ct$, $v(x,\ct,y) = y$. 
-
-Debater 2 (``loss optimizer'') will choose $\cf = \hy$. Unless \dt chooses the winning certificate, it learns nothing. 
-
-Debater 1 winning strategy: try all certificates and predictions. If a loss is incurred, this pair of certificate and label cannot be correct so it is removed. So there can be at most $2|\C|-1$ mistakes for debater 1 regardless of debater 2 strategy. No winning strategy can do better because debater 2 may always refute when possible. 
-
-Debater 2 winning strategy: (loss) all strategies are winning wr.t. loss. So it can use the strategy that never refutes. This will cause debater 1 to incur a loss of 0. But mistakes wrt $h^*$ are at least $T/2$. 
-
-Debater 2 winning strategy: (regret) it would select $\cf = 1-\hy$ in every round, and would get a regret of zero. So after at most $2|\C|-1$ rounds debater 1 never makes another true mistake. 
-
-we showed: when optimizing for losses, we can have $\Mi(T) \gg \tLo$ and $\Mi(T) \geq T/2$. 
-and when optimizing for regret, we get a bound on $\Mi(T)$ based on individual optimization of the debaters. 
-
-\[
-\begin{pmatrix}
-    0 & 1\\
-    0 & 1\\
-    b & b\\
-    0 & 1
-\end{pmatrix}
-\]
 
 
 
@@ -679,7 +650,7 @@ For this consider the following adversary behaviour:
         \item Otherwise, output output $\tilde{y}_{t} = 1$.
     \end{itemize}
 \end{itemize}
-We will argue that independent of the learner's behaviour, the resulting sequence is $k$-consistent with a verifier $v^* \in \V$ such that $\sum_{t=1}^T \indct[h_{v^*}(x) \neq \hat{y}_t] \geq T/2$. \tosca{define k-consitent as consistent other than in $k$ exception rounds}
+We will argue that independent of the learner's behavior, the resulting sequence is $k$-consistent with a verifier $v^* \in \V$ such that $\sum_{t=1}^T \indct[h_{v^*}(x) \neq \hat{y}_t] \geq T/2$. \tosca{define k-consistent as consistent other than in $k$ exception rounds}\sivan{note we don't use "exceptions" in this paper, it's called misspecified rounds or feedback}
 It is sufficient to argue that the sequence is $k$-consistent with both $h_0$ and $h_1$.
 First we note, that the choice of sequence is always consistent with the verifier class $\mathcal{V}$.
 We now argue that the predicted sequence will always be consistent with $h_1$, since the only way to get verifier feedback that is sufficient for reducing the version space for $\mathcal{H}$ in \tosca{finite/small number of rounds? depends on allowed certificate space which one} is through figuring out the sequence $a_{d-1} \dots a_1$ and getting verifier feedback $v(x, \bar{c}) = h^* (x) $ with $\bar{c} = c_1c_2 \dots c_{2n}$ with $c_1 = \dots = c_{2n} = a_{d-1} \dots a_1 1 0 0$. Since the adversary would pick output $\tilde{y}_t =1$ for any such choices of certificates, the sequence will remain consistent with hypothesis $h_1$.
