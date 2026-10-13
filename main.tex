@@ -65,7 +65,7 @@
 
 \section{Related Work}
 
-\vinayak{works on theoretic debate learning, works on rich feedback/interactive learning protocols including DFF}
+\vinayak{works on rich feedback/interactive learning protocols including DFF}
 \sivan{cite DFF where needed}
 \input{related-work}
 
@@ -139,8 +139,8 @@ In this case, \df provides its certificates in good faith ``for the sake of the 
 
 
 
-In contrast, a standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument\sivan{vinayak, we need a reference for this}.
-We formalize this by defining a loss\vinayak{are there previous works that formalize it this way? (sivan)}~\vinayak{yes this is the standard loss function used in the literature. Often it's somewhat more general because the verifier gives a score, which can be a fraction, that judges how well does the debate transcript prove that the true label of $x$ is $\hat{y}$}\sivan{In this case we need a reference} for each debater. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
+In contrast, a standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument~\citep{irving2018debate,chen2023playing,browncohen2024debate,browncohen2025prover}.
+We formalize this by defining a loss for each debater, as is standard~\citep{irving2018debate,browncohen2024debate}. Some works let the verifier output a score rather than a binary verdict, measuring how strongly the debate transcript supports the proposed label~\citep{chen2023playing,arnesen2024training,browncohen2025prover}; we use binary verdicts throughout. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
 \begin{align*}
  \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].
 \end{align*}
