@@ -150,8 +150,8 @@ Therefore, \df is evaluated through the opposite loss:
  \fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t] = T - \tLo(T).
 \end{align*}
 In principle, this setting, in which each debater attempts to optimize its own loss, can lead \dt to propose hypothesized labels $\hy_t$ that it knows it can argue for, even though it is already aware that this does not correspond to the underlying true label $y_t$. 
-\vinayak{Is this assumption also standard in the debate literature? if so we need references (sivan)} We assume that each debater is unaware of the behavior of the other debater, and therefore runs its strategy assuming that the other debater can be adversarial to it, providing worst-case sequences with respect to its loss objective. This is optimal, in the sense if \dt and \df were each optimal against their opponent, then their worst-case loss would be equal to the worst-case loss that can be obtained by a debater that assumes that the other debater is adversarial (see Lemma~\ref{lem:equilibrium} in the appendix).\footnote{Note, however, that such an equilibrium does not necessarily exist for deterministic debaters \citep{vonneumann1928theorie}.}
-We call this the \emph{oppositional setting}. 
+\vinayak{Is this assumption also standard in the debate literature? if so we need references (sivan)} We assume that each debater is unaware of the behavior of the other debater, and therefore runs its strategy assuming that the other debater can be adversarial to it, providing worst-case sequences with respect to its loss objective. \sivan{depends on lemma: This is optimal, in the sense if \dt and \df were each optimal against their opponent, then their worst-case loss would be equal to the worst-case loss that can be obtained by a debater that assumes that the other debater is adversarial (see Lemma~\ref{lem:equilibrium} in the appendix).\footnote{Note, however, that such an equilibrium does not necessarily exist for deterministic debaters \citep{vonneumann1928theorie}.}
+We call this the \emph{oppositional setting}. }
 
 
 
@@ -757,7 +757,7 @@ automatically hides this text.}
 
 % \crefalias{section}{appendix} % uncomment if you are using cleveref
 
-
+\iffalse
 
 \section{Deferred proofs}
 
@@ -805,7 +805,7 @@ Symmetrically,
 \end{proof}
 
 
-
+\fi
 
 
 
