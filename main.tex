@@ -132,25 +132,27 @@ A run of the debate protocol is evaluated through the \emph{number of mistakes} 
  \Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t].
 \end{align*}
 
-We can consider \dt and \df that can be cooperative, with the joint goal to minimize $\Mi(T)$. 
-In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity that we also sometimes refer to as \emph{the learner} in this case.
 
 
 
 
-In contrast, a standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument~\citep{irving2018debate,chen2023playing,browncohen2024debate,browncohen2025prover}.
-We formalize this by defining a loss for each debater, as is standard~\citep{irving2018debate,browncohen2024debate}. Some works let the verifier output a score rather than a binary verdict, measuring how strongly the debate transcript supports the proposed label~\citep{chen2023playing,arnesen2024training,browncohen2025prover}; we use binary verdicts throughout. \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss:
-\begin{align*}
- \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].
-\end{align*}
+A standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument~\citep{irving2018debate,chen2023playing,browncohen2024debate,browncohen2025prover}.
+Standard formalizations \citep{irving2018debate,browncohen2024debate} define a loss for each debater.\footnote{Some works let the verifier output a score rather than a binary verdict, measuring how strongly the debate transcript supports the proposed label~\citep{chen2023playing,arnesen2024training,browncohen2025prover}; we use binary verdicts throughout.} Debater \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss: $\tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].$ 
 Debater \df, on the other hand, is evaluated against its aim to falsify the hypothesis that the first debater proposed, by setting its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
 Therefore, \df is evaluated through the opposite loss: 
-\begin{align*}
- \fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t] = T - \tLo(T).
-\end{align*}
-In principle, this setting, in which each debater attempts to optimize its own loss, can lead \dt to propose hypothesized labels $\hy_t$ that it knows it can argue for, even though it is already aware that this does not correspond to the underlying true label $y_t$. 
-\vinayak{Is this assumption also standard in the debate literature? if so we need references (sivan)}~\vinayak{I am not sure if there is an assumption here. I think Ruth is just trying to say that minimizing the debater's loss isn't the same as minimizing mistakes.} We assume that each debater is unaware of the behavior of the other debater, and therefore runs its strategy assuming that the other debater can be adversarial to it, providing worst-case sequences with respect to its loss objective. \sivan{depends on lemma: This is optimal, in the sense if \dt and \df were each optimal against their opponent, then their worst-case loss would be equal to the worst-case loss that can be obtained by a debater that assumes that the other debater is adversarial (see Lemma~\ref{lem:equilibrium} in the appendix).\footnote{Note, however, that such an equilibrium does not necessarily exist for deterministic debaters \citep{vonneumann1928theorie}.}
-We call this the \emph{oppositional setting}. }
+%\begin{align*}
+ $\fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t] = T - \tLo(T).$
+%\end{align*}
+If the learning problem is ignored, so that $v^*$ is known to both debaters, then a \dt optimizing $\tLo(T)$ with respect to a \df that optimizes $\fLo(T)$ leads to \dt always proposing the true label of $h^*$ verified by $v^*$, with certificates that cannot be refuted. Moreover, this leads to $\Mi(T) = \tLo(T)$, motivating this optimization objective. We discuss below the setting of two debaters that optimize their objectives separately, which we term the \emph{oppositional setting}. 
+
+We can also consider \dt and \df that can be cooperative, with the joint goal to minimize $\Mi(T)$. 
+In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity that we also sometimes refer to as \emph{the learner} in this case. We study this learning setting below.
+
+
+%In principle, this setting, in which each debater attempts to optimize its own loss, can lead \dt to propose hypothesized labels $\hy_t$ that it knows it can argue for, even though it is already aware that this does not correspond to the underlying true label $y_t$. 
+%\vinayak{Is this assumption also standard in the debate literature? if so we need references (sivan)}~\vinayak{I am not sure if there is an assumption here. I think Ruth is just trying to say that minimizing the debater's loss isn't the same as minimizing mistakes.} 
+
+%We assume that each debater is unaware of the behavior of the other debater, and therefore runs its strategy assuming that the other debater can be adversarial to it, providing worst-case sequences with respect to its loss objective. \sivan{depends on lemma: This is optimal, in the sense if \dt and \df were each optimal against their opponent, then their worst-case loss would be equal to the worst-case loss that can be obtained by a debater that assumes that the other debater is adversarial (see Lemma~\ref{lem:equilibrium} in the appendix).\footnote{Note, however, that such an equilibrium does not necessarily exist for deterministic debaters \citep{vonneumann1928theorie}.}We call this the \emph{oppositional setting}. }
 
 
 
@@ -169,7 +171,6 @@ We call this the \emph{oppositional setting}. }
 
 
 
-\sivan{to adapt later: We study the number of mistakes incurred in both scenarios. We study for which verifier classes $\V$ the above protocol leads to a finite mistake bound (or sublinear regret) for the debate evaluation.}
 
 
 
@@ -411,7 +412,7 @@ The first inequality follows by the realizability assumption, which implies that
 % \]
 % \end{lemma}
 
-
+\iffalse
 \section{\textcolor{red}{Some things we want to do}}
 
 \begin{itemize}
@@ -421,72 +422,21 @@ The first inequality follows by the realizability assumption, which implies that
     \item oppositional case agnostic - ??
     \item is online learning always easier? - Tosca?
 \end{itemize}
-
+\fi
 
 
 \section{Oppositional debaters}
 \label{sec:oppositional}
 
-\subsection{\sivan{temp}}
+We now turn to consider the oppositional setting. As described in Section~\ref{formal}, the standard approach (that does not involve learning) considers debaters that optimize the worst case $\tLo$ and $\fLo$ with respect to a worst-case opposing debater. However, we show here that in a learning setting, an approach minimizing a notion of \emph{regret} is more suitable. 
 
-We show that even if each debater optimizes its worst-case loss against worst-case environment and opposing debater, this does not provide helpful guarantees for learning. 
-First, we observe that for \dt, this optimization criterion is  meaningless, since all \dt strategies are optimal according to this criterion. 
+\subsection{Using regret to upper bound prediction mistakes}
 
-\begin{claim}\label{claim:deb2}
-    For any verifier class $\V$ and any number of rounds $T$, the worst-case optimal loss for $\df$ is $T$. 
-\end{claim}
-\begin{proof}
-Consider a sequence $(x_t,\hy_t,\ct_t)_{t \in [T]}$ that is consistent with some verifier $v^* \in \V$ such that for each $t$, $\forall \cf_t, v^*(x_t, \ct_t, \cf_t) = \hy_t$. Note that such a $\ct_t$ exists for every $x \in \X$ according to the definition of a verifier. 
-For this sequence, any response of \df has $\hy_t = \vy_t$. Hence \df incurs a loss in every round, leading to $\fLo(T) = T$.
-\end{proof}
-
-In addition, we show that the loss of \dt cannot be used to upper bound the debate protocol mistakes $\Mi(T)$, even if both debaters are worst-case optimal with respect to their loss as indicated above. In contrast, if the debaters are worst-case optimal with respect to their \emph{regret}, then according to the bound \todo{ref} these regrets upper bound $\Mi(T)$. In the same example, we show that $\Mi(T)$ is large under the loss optimization scenario but small under the regret optimization scenario. 
-\begin{theorem}
-    There is a verifier class $\V$ such that \todo{loss-optimizing} debaters lead to 
-    $\ex[\Mi(T)] \geq T/4$ while for all sequences, $\tLo(T) \leq 1.5$. On the other hand, \todo{regret-optimizing} debaters lead to $\Mi(T) \leq 1.5$.
-\end{theorem}
-\begin{proof}
-Let $\X = \{x\}$ and $\C = \{0,1\}$. Let $\H = \{h_0,h_1\}$, where $h_b(x) = b$ for  $b\in\{0,1\}$. Let $\V$ be the class of all verifiers $\{ v_{b,c} \mid b,c \in \{0,1\}\}$  such that $\forall \cf \in \C, v_{b,c}(x,c,\cf) = b$, and for $1-c$ we have $v_{b,c}(x,1-c,\cf) = \cf$ for $\cf \in \C$, as illustrated below.
-\[
-\begin{array}{c|cc}
- v_{b,c}(x,\ct,\cf) & \cf=0 & \cf=1\\
-\hline
-\ct=c & b & b\\
-\ct = 1-c & 0 & 1
-\end{array}
-\]
-Note that $v_{b,c}$ verifies $h_b$. 
-
-First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$. In the first round, it selects $\hy,\ct$ uniformly at random from the set of active pairs. In each round, if it incurs a loss using some pair, it removes this pair from the active set and selects another pair for the next round uniformly at random. If it does not incur a loss using in a round, it continues to use the same pair in the next round. 
-
-To see that this is worst-case optimal, observe that whenever \df proposes some $\hy$ and $\ct$ for some $x \in \X$ and incurs a loss with some \dt certificate $\cf$, this means that 
-$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. Hence, this \df strategy only incurs a loss at most once for every pair until selecting $b^*, c^*$. The expected number of pair selections before selecting this pair is $1.5$, hence the expected loss of $\df$ is at most $1.5$. This is worst-case optimal, since any strategy that does not replace a pair that has incurred a loss will incur the loss again in the next round against a worst-case \df, thus its worst-case loss cannot be smaller.
-
-Moreover, let $r$ be the last round before $b^*,c^*$ is found, then using this \df strategy we get $\Mi(T) \leq r$, since no prediction mistake is made after this round. However, the value of $r$ depends on the strategy of \dt, as we now show.
-
-First, consider the optimal \dt according to loss minimization. As shown in Claim~\ref{claim:deb2}, all \dt strategies are optimal with respect to worst-case loss minimization. In particular, consider the strategy that in every round, upon observing $(x_t, \ct_t, \hy_t)$, selects the response $\cf_t = \hy_t$. Under this strategy, if $\ct_t = 1-c^*$, then $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,\hy_t) = \hy_t$. Therefore, when the optimal \dt strategy described above is used, if in the first round \dt selects $(\hy,\ct) = (1-b^*,1-c^*)$, it incurs no loss and does not change its strategy for the rest of the run, never trying $b^*, c^*$, and incurring a prediction mistake in every round. The probability that \df tries $(\hy,\ct) = (1-b^*,1-c^*)$ in the first round is $1/4$. Hence, using these two debaters leads to $\ex[\Mi(T)] \geq T/4$.
-
-Second, consider the optimal \dt according to regret minimization. Consider the following strategy: In every round, \dt selects $\cf_t = 1-\hy_t$. Then, if $\ct_t = 1-c^*$, we have $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,1-\hy_t) \neq \hy_t$ and \df does not incur a loss. If  $\ct_t = c^*$, then this is an unachievable round \sivan{define}, hence \df may incur a loss but it does not accumulate regret. Thus, this strategy obtains zero regret and so it is optimal with respect to regret minimization. 
-
-Using this strategy against the optimal \dt strategy described above leads to \dt incurring a loss with every pair except for $(\hy,\ct) = (b^*,c^*)$. Therefore, the expected number of rounds until it tries $(\hy,\ct) = (b^*,c^*)$ is $1.5$, leading to $\Mi(T) \leq 1.5$. This can also be derived from the \todo{ref regret upper bound}.
-\end{proof}
-
- 
-
-
-
-\section{\sivan{temp}}
-
-We now consider the case of oppositional debaters, in which each debater attempts to optimize their loss with respect to a potentially adversarial opponent. We show that in this setting, the protocol's mistakes can be upper bounded by the regrets of the two opposing debaters. 
-
-In the realizable setting, given $v^*$, there is a strategy for \dt that obtains $\tLo(T) = 0$, since it can choose $\ct^1,\ldots,\ct^n$ that satisfy the validation requirement of $v^*$ for any $\cf^1,\ldots,\cf^n$. Thus, the regret of \dt is equal to its loss: 
+Given $v^*$, there is a strategy for \dt that obtains $\tLo(T) = 0$, since for any $x_t$, it can choose $\ct^1,\ldots,\ct^n$ that satisfy the validation requirement of $v^*$ for any $\cf^1,\ldots,\cf^n$. We call a round in which \dt selected such certificates an \emph{irrefutable round}. For \df, even given $v^*$, it cannot avoid incurring a loss in irrefutable rounds. Therefore, for \df a notion of regret instead of loss is relevant even in a realizable setting: Let $U(T)$ be the number of irrefutable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. For \dt in the realizable setting, its regret is equal to its loss: 
 $\tRe(T) = \tLo(T)$. 
 
-For \df, even given $v^*$, there could be rounds where a loss is inevitable, because \dt selected arguments that cannot be refuted. 
-We call such rounds \emph{unachievable} for \dt. Let $U(T)$ be the number of unachievable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. 
 
-The following result shows that the total regret of the debaters upper bounds the total mistakes of the debate protocol. This motivates the oppositional setting: If each debater selfishly succeeds to obtain a lower regret, it also reduces the prediction error of the protocol.\footnote{\sivan{(not sure yet about this comment, related to regret vs loss issue) Note in particular, that if \df wants to minimize its regret, it can do so by helping \dt identify the true $v^*$, since this would lead to $U(T) = T$ and $\fRe(T) = 0$. However, this may require \df to make assumptions on the behavior of \dt and not treat its input as fully adversarial.}}
-
+The following claim shows that the total regret of the debaters upper bounds the total mistakes of the debate protocol. 
 
 
 % The value of the overall debate that the two debaters produce is measured by assessing whether the sequence of produced arguments/certificates actually lead the verifier to conclude the correct label $\ty_t$ in each round.
@@ -516,11 +466,11 @@ The following result shows that the total regret of the debaters upper bounds th
 % }
 
 
-\begin{claim}
-  $\Mi(T) \leq \Re_\ct(T) + \Re_\cf(T)$.
+\begin{claim}\label{claim:regret}
+In any run of the debate protocol,  $\Mi(T) \leq \Re_\ct(T) + \Re_\cf(T)$.
 \end{claim}
 \begin{proof}
-In an unachievable round,  \dt's choices force $v^*$ to output $\hy_t$, regardless of the choices of \df. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no prediction mistakes in these rounds. Hence, $\Mi(T) \leq T-U(T)$. In every round, exactly one of the debaters incurs a loss, so
+In an irrefutable round,  \dt's choices force $v^*$ to output $\hy_t$, regardless of the choices of \df. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no prediction mistakes in these rounds. Hence, $\Mi(T) \leq T-U(T)$. In every round, exactly one of the debaters incurs a loss, so
 $T =  \tLo(T)+\fLo(T)$. Therefore
 \[
 \Mi(T) \leq \tLo(T)+\fLo(T)-U(T) = \Re_\ct(T) + \Re_\cf(T).
@@ -528,10 +478,70 @@ $T =  \tLo(T)+\fLo(T)$. Therefore
 As claimed.
 \end{proof}
 
+This upper bound motivates new objectives for \dt and \df in the oppositional setting when learning is involved: if each debater minimizes their worst-case \emph{regret} with respect to a worst-case opposing debater, this upper bounds the worst-case number of debate protocol mistakes: if the worst-case regret for \dt over $T$ rounds is $R_\ct^T$ and the worst-case regret for \df  over $T$ rounds is $R_\cf^T$, then for any sequence, $\Mi(T) \leq R_\ct^T+ R_\cf^T$.
+
+
+
+%This motivates the oppositional setting: If each debater selfishly succeeds to obtain a lower regret, it also reduces the prediction error of the protocol.\footnote{\sivan{(not sure yet about this comment, related to regret vs loss issue) Note in particular, that if \df wants to minimize its regret, it can do so by helping \dt identify the true $v^*$, since this would lead to $U(T) = T$ and $\fRe(T) = 0$. However, this may require \df to make assumptions on the behavior of \dt and not treat its input as fully adversarial.}}
+
+
+
+Moreover, we show next that unlike the regret optimization approach, the loss optimization approach discussed above does not provide similar guarantees and can in fact completely fail. 
+
+\subsection{Loss optimization vs.~regret optimization}
+
+We show that even if each debater optimizes its worst-case loss against worst-case environment and opposing debater, this does not provide helpful guarantees for learning. 
+First, we observe that for \dt, this optimization criterion is  meaningless, since all \dt strategies are optimal according to this criterion. 
+
+\begin{claim}\label{claim:deb2}
+    For any verifier class $\V$ and any number of rounds $T$, the worst-case optimal loss for $\df$ is $T$. 
+\end{claim}
+\begin{proof}
+Consider a sequence $(x_t,\hy_t,\ct_t)_{t \in [T]}$ that is consistent with some verifier $v^* \in \V$ such that for each $t$, $\forall \cf_t, v^*(x_t, \ct_t, \cf_t) = \hy_t$. Note that such a $\ct_t$ exists for every $x \in \X$ according to the definition of a verifier. 
+For this sequence, any response of \df has $\hy_t = \vy_t$. Hence, \df incurs a loss in every round, leading to $\fLo(T) = T$.
+\end{proof}
+
+In addition, we show that the loss of \dt cannot be used to upper bound the debate protocol mistakes $\Mi(T)$, even if both debaters are worst-case optimal with respect to their loss as indicated above. In contrast, if the debaters are worst-case optimal with respect to their \emph{regret}, then according to the bound in Claim~\ref{claim:regret}, these regrets upper bound $\Mi(T)$. In the same example, we show that $\Mi(T)$ is large under the loss optimization scenario but small under the regret optimization scenario. 
+\begin{theorem}
+    There is a verifier class $\V$ such that loss-optimizing debaters lead to 
+    $\ex[\Mi(T)] \geq T/4$ for all environment inputs, whereas $\ex[\tLo(T)] \leq 1.5$. On the other hand, regret-optimizing debaters lead to $\ex[\Mi(T)] \leq \ex[\tLo(T)] = 1.5$ for all environment inputs.
+\end{theorem}
+\begin{proof}
+Let $\X = \{x\}$ and $\C = \{0,1\}$. Let $\H = \{h_0,h_1\}$, where $h_b(x) = b$ for  $b\in\{0,1\}$. Let $\V$ be the class of all verifiers $\{ v_{b,c} \mid b,c \in \{0,1\}\}$  such that $\forall \cf \in \C, v_{b,c}(x,c,\cf) = b$, and for $1-c$ we have $v_{b,c}(x,1-c,\cf) = \cf$ for $\cf \in \C$, as illustrated below.
+\[
+\begin{array}{c|cc}
+ v_{b,c}(x,\ct,\cf) & \cf=0 & \cf=1\\
+\hline
+\ct=c & b & b\\
+\ct = 1-c & 0 & 1
+\end{array}
+\]
+Note that $v_{b,c}$ verifies $h_b$. 
+
+First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$. In the first round, it selects $\hy,\ct$ uniformly at random from the set of active pairs. In each round, if it incurs a loss using some pair, it removes this pair from the active set and selects another pair for the next round uniformly at random. If it does not incur a loss using in a round, it continues to use the same pair in the next round. 
+
+To see that this is worst-case optimal, observe that whenever \df proposes some $\hy$ and $\ct$ for some $x \in \X$ and incurs a loss with some \dt certificate $\cf$, this means that 
+$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. Hence, this \df strategy only incurs a loss at most once for every pair until selecting $b^*, c^*$. The expected number of pair selections before selecting this pair is $1.5$, hence the expected loss of $\df$ is at most $1.5$. This is worst-case optimal, since any strategy that does not replace a pair that has incurred a loss will incur the loss again in the next round against a worst-case \df, thus its worst-case loss cannot be smaller.
+
+Moreover, let $r$ be the last round before $b^*,c^*$ is found, then using this \df strategy we get $\Mi(T) \leq r$, since no prediction mistake is made after this round. However, the value of $r$ depends on the strategy of \dt, as we now show.
+
+First, consider the optimal \dt according to loss minimization. As shown in Claim~\ref{claim:deb2}, all \dt strategies are optimal with respect to worst-case loss minimization. In particular, consider the strategy that in every round, upon observing $(x_t, \ct_t, \hy_t)$, selects the response $\cf_t = \hy_t$. Under this strategy, if $\ct_t = 1-c^*$, then $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,\hy_t) = \hy_t$. Therefore, when the optimal \dt strategy described above is used, if in the first round \dt selects $(\hy,\ct) = (1-b^*,1-c^*)$, it incurs no loss and does not change its strategy for the rest of the run, never trying $b^*, c^*$, and incurring a prediction mistake in every round. The probability that \df tries $(\hy,\ct) = (1-b^*,1-c^*)$ in the first round is $1/4$. Hence, using these two debaters leads to $\ex[\Mi(T)] \geq T/4$.
+
+Second, consider the optimal \dt according to regret minimization. Consider the following strategy: In every round, \dt selects $\cf_t = 1-\hy_t$. Then, if $\ct_t = 1-c^*$, we have $\vy_t = v_{b^*,c^*}(x_t,\ct_t,\cf_t) = v_{b^*,c^*}(x_t,1-c^*,1-\hy_t) \neq \hy_t$ and \df does not incur a loss. If  $\ct_t = c^*$, then this is an irrefutable round, hence \df may incur a loss but it does not accumulate regret. Thus, this strategy obtains zero regret and so it is optimal with respect to regret minimization. 
+
+Using this strategy against the optimal \dt strategy described above leads to \dt incurring a loss with every pair except for $(\hy,\ct) = (b^*,c^*)$. Therefore, the expected number of rounds until it tries $(\hy,\ct) = (b^*,c^*)$ is $1.5$, leading to $\Mi(T) \leq 1.5$. This can also be derived from Claim~\ref{claim:regret}.
+\end{proof}
+
+ The results above motivate setting the objective of oppositional debaters to regret instead of loss. Nonetheless, as we show next, even with this objective, oppositional debaters can still fail where cooperative debaters succeed.
+
+
+
+\subsection{Gap between cooperative and oppositional debaters}
+
 
 \input{cooperative-example}
 
-
+\iffalse
 \subsection{(\sivan{work in progress) dimensions for oppositional debaters}}
 
 To evaluate the worst-case regret of an oppositional debater against an adversary, we can define appropriate dimensions for \dt and \df.
@@ -555,6 +565,7 @@ Moreover, each edge starting at a node $(\vy,x,\hy, \ct)$ ends in a node with $\
 
 
 \sivan{TODO: define the depth with respect to the loss only, since this is what this debater optimizes. The dimension $\cfd(\V)$ is defined as the maximum depth of a tree of this type. }
+\fi
 
 \section{Non-realizability with cooperative debaters}
 
@@ -678,13 +689,13 @@ Thus both of the functions are $k$-consistent with any sequence resulting from t
 \section{Unrealizable oppositional setting \todo{complete this}}
 
 In this case, in the oppositional setting we extend the regret to account for misspecified rounds. For \dt, we define $\Re_\ct(T) = \tLo(T) - k$, where $k$ is the minimal value such that the sequence is $k$-non-realizable. For \df, we define 
-$\Re_\cf(T) = \fLo(T) - k - k'$, where $k$ is the minimal value such that the sequence is $k$-non-realizable and $k'$ is the number of realizable rounds that are unachievable. 
+$\Re_\cf(T) = \fLo(T) - k - k'$, where $k$ is the minimal value such that the sequence is $k$-non-realizable and $k'$ is the number of realizable rounds that are irrefutable. 
 
-\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{unachievable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or unachievable}$. }
+\vinayak{For all three of $\Mi(T), \tLo(T)$, and $\fLo(T)$, we define the corresponding notions of regret, where we subtract from the terms, the smallest loss achievable with the knowledge of the true $v^*$. Since the knowledge of the true $v^*$ would give us zero mistakes, we define \emph{debate regret} as simply $\Re(T) = \Mi(T)$. The \dt can't know what rounds are misspecified even if it knows the true $v^*$, therefore \dt's regret is $\Re_T(T) = \tLo(T) - k$. To define \df's regret, note that there are two kinds of rounds where it cannot achieve a loss of 0 even if it knows the true $v^*$: a) if the round is misspecified, and b) if the \dt has played optimally. We call a round where \dt has played optimally an \emph{irrefutable} round. Thus we define $\Re_F(T) = \fLo(T) - \#\text{rounds that are misspecified or irrefutable}$. }
 
 and the \emph{debate regret}
 quad\vinayak{\text{define regret in comparison to optimal debaters(?)}}
-unachievable rounds
+irrefutable rounds
 \dt is evaluated through its \emph{loss} and its \emph{regret}
 \begin{align*}
  \tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t]\quad\text{and}\quad \Re_T(T) = \tLo(T) - \#\text{misspecified rounds}
@@ -698,11 +709,11 @@ unachievable rounds
   $\Re(T) \leq \Re_\ct(T) + \Re_\cf(T) + 2k$.
 \end{claim}
 \begin{proof}
-Let $u$ be the number of unachievable rounds that are not misspecified. On an unachievable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
+Let $u$ be the number of irrefutable rounds that are not misspecified. On an irrefutable round, the \dt's certificates force $v^*$ to output $\hy_t$ whatever the \df does. Since $v^*$ validates $h^*$, this means that $\hy_t=h^*(x_t)$, so there are no mistakes on these $u$ rounds. In every round, exactly one of the debaters incurs a loss, so
 \[
 \Mi(T) \leq T-u = \tLo(T)+\fLo(T)-u.
 \]
-By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or unachievable are the $k$ misspecified rounds together with the $u$ unachievable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
+By the definition of $\Re_T(T)$, we have $\tLo(T)=\Re_T(T)+k$. The rounds that are misspecified or irrefutable are the $k$ misspecified rounds together with the $u$ irrefutable rounds that are not misspecified, so $\fLo(T)-u=\Re_F(T)+k$. Substituting both gives $\Re(T)=\Mi(T)\leq\Re_T(T)+\Re_F(T)+2k$.
 \end{proof}
 }
 
