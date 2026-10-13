@@ -458,12 +458,13 @@ Consider \todo{an infinite $\X$} and $\C = \{0,1\}$. Consider $\H = \{h_0,h_1\}$
 \]
 Note that $v_{b,c}$ verifies $h_b$. 
 
-First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$, initialized to the . In each round selects $\hy,\ct$ uniformly at random out of those pairs that have not 
-
-
+First, consider an optimal \df. Note that loss optimization and regret optimization are equivalent for \df. Let $b^* \in \{0,1\},c^*\in \C$ such that $v^* = v_{b^*,c^*}$. Consider the following \df strategy: It maintains a set of active pairs of label and certificate, initialized to $\{0,1\}\times \C$. In each round, it selects $\hy,\ct$ uniformly at random from the set of active pairs. If it incurs a loss using some pair, it removes this pair from the active set. If it does not incur a loss using some pair, it continues to use it in subsequent rounds. 
 
 Whenever \df proposes some $\hy$ and $\ct$ for some $x \in \X$ and incurs a loss with some \dt certificate $\cf$, this means that 
-$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. In addition, it implies that any subsequent uses of $\hy,\ct$ would incur a loss against a worst-case \df. Hence, since \dt minimizes its worst-case loss (regret), it will not use a pair on which it incurred a loss. Moreover, if it does not incur a loss in a given round with some $\hy,\ct$, it must continue to use this pair, since it $\hy,\ct$
+$\vy = v_{b^*,c^*}(x,\ct,\cf) \neq \hy$. This implies that $v_{b^*, c^*} \neq v_{\hy,\ct}$, since $v_{\hy,\ct}(x,\ct,\cf) = \hy$. Hence, the loss incurred by this strategy is equal to the expected number of pairs it tries before 
+
+
+Hence, since \dt minimizes its worst-case loss (regret), it will not use a pair on which it incurred a loss. Moreover, if it does not incur a loss in a given round with some $\hy,\ct$, it must continue to use this pair, since it $\hy,\ct$
 
 After at most $3$ rounds in which loss is incurred for \df, only one pair remains, which must be $b^*,c^*$. In this case, an optimal \df must use this pair for all subsequent rounds. It is easy to see that this strategy is optimal for \dt, since no strategy can guarantee $\tLo(T) < 3$ against a worst-case \df.
 Moreover, let $r$ be the round after which one pair remains, then $\Mi(T) \leq r$ since no prediction mistake is made after this round. 
