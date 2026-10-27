@@ -1,0 +1,39 @@
+First, we show a simple verifier class that is easy to learn in the realizable cooperative case (with randomized debaters), but not when there are misspecifications.
+
+\begin{example}\label{example:sep}
+    Consider debates of length one. Let $\X=\naturals$, $\C=\{0,1\}$, and let $\ct_t$ and $\cf_t$ be the certificates at step $t$. For $b\in\{0,1\}$, let $h_b$ be the constant hypothesis $h_b(x)=b$, and let $\H=\{h_0,h_1\}$. For every bit $b$ and every function $e:\X\to \C\times\C$, define
+\[
+v_{b,e}(x,\ct,\cf)=
+\begin{cases}
+1-b, & (\ct,\cf)=e(x),\\
+b, & \text{otherwise},
+\end{cases}
+\]
+To illustrate, suppose that $e(x) = (c_0,c_1)$, then the value of $v_{b,e}(x,\ct,\cf)$ is as follows.
+\[
+\begin{array}{c|cc}
+v_{b,e}(x,\ct,\cf) & \cf=c_1 & \cf=1-c_1\\
+\hline
+\ct=c_0 & 1-b & b\\
+\ct=1-c_0 & b & b
+\end{array}
+\]
+Let $\V=\{v_{b,e}:b\in\{0,1\},\ e:\X\to \C\times\C \}$. 
+%For each $x$, think of $v(x,\cdot,\cdot)$ as a $2\times2$ table with rows indexed by the \dt's certificate $\ct$ and columns by the \df's certificate $\cf$. The table of $v_{b,e}$ at $x$ has every entry equal to $b$, except the entry $e(x)$, which equals $1-b$. If $e(x)=\bot$, there is no such entry, and the whole table is $b$. 
+
+Clearly, for any $b,e$, $v_{b,e}$ validates $h_b$, using the $p$ that gives $b$ for any $r$. 
+\end{example}
+
+
+\begin{theorem}\label{thm:examplesep}
+For Example~\ref{example:sep}, the following two properties hold. In the realizable case with cooperative debaters, there is a randomized strategy that obtains $\ex[\Mi(T)]<9$ for every $T$, every $v^*\in\V$ and every sequence of input instances. In the unrealizable case, for every $k\ge1$ and every $T\ge 3k$, the environment 
+can choose the inputs and draw $v^*\in\V$ and the misspecified rounds at random in advance, so that the expected number of misspecified rounds is $k$ and every strategy of the debaters has $\ex[\Mi(T)]\ge\frac32k$.
+\end{theorem}
+
+% The idea is that a random entry of a table in $\V$ provides the true label $b$ with probability $3/4$, while a misspecified round can provide $1-b$ regardless of the choice of $\ct,\cf$. If each round is misspecified with probability $1/3$, 
+% the probability of obtaining the true $b$ in each round is $1/2$. Consider a sequence of non-repeating instances $x_1,x_2,\ldots x_T = 1,2,\ldots, T$. With the above misspecification strategy, it is impossible to gain any information on $b$ from the interaction. 
+
+
+%  Let $x_t=t$ and $m=3k$, and consider the following random instance, drawn before the interaction. Sample $b$ uniformly and set $h^*=h_b$. Independently for each $t\le m$, with probability $1/3$ make round $t$ misspecified and set every entry of $v^*(x_t,\cdot,\cdot)$ to $b$, so that $\vy_t=1-b$ whatever the certificates. Otherwise, set every entry of $v^*(x_t,\cdot,\cdot)$ to $b$ except one uniformly random entry $e_t\in\C\times\C$, which we set to $1-b$. No later round is misspecified, and for every input $x>m$, every entry of $v^*(x,\cdot,\cdot)$ is $b$. Every table of $v^*$ has at most one entry that differs from $b$, so $v^*\in\V$ validates $h^*$. Let $K$ be the number of misspecified rounds, so $K\sim\mathrm{Binomial}(m,1/3)$. In particular, $\ex[K]=m/3=k$.
+
+% Fix a strategy (potentially randomized) of the debaters, which may depend on $k$ and $T$. We show that $\ex[\Mi(m)]=m/2$. Let $I_{t-1}$ consist of the debaters' random bits and the transcript of the first $t-1$ rounds. On a misspecified round $\vy_t=1-b$, and on any other round $\vy_t=b$ unless $(\ct_t,\cf_t)=e_t$. Hence, for each $a\in\{0,1\}$ and any certificates, $\Pr(\vy_t=a\mid h^*=h_a,I_{t-1})=\frac23\cdot\frac34+\frac13\cdot0=\frac12$. So whichever of $h_0$ and $h_1$ is the true hypothesis, each $\vy_t$ is a fair coin independent of $I_{t-1}$, which means $\Pr(\hy_t\ne\ty_t)=1/2$.  Summing over $t\le m$ gives $\ex[\Mi(m)]=m/2$. Since $m=3k\le T$, we get $\ex[\Mi(T)]\ge\ex[\Mi(m)]=\frac32k$, while the expected number of misspecified rounds is $\ex[K]=k$.

@@ -1,0 +1,13 @@
+There is very little previous work that analyzes learning in the
+setting of debate. Perhaps the two that are closest to our work
+are~\citet{chen2023playing} and~\citet{buzaglo2025hidden}. Both model
+debate as a repeated game between the two debaters with a fixed payoff
+matrix. Since the space of arguments is too large to enumerate, the
+debaters access this matrix through an optimization oracle, and both
+papers give efficient no-regret strategies under this access. By
+classic results, the time-averaged play then converges to an
+equilibrium~\citep{freund1999adaptive,hart2000simple}. In this model,
+the debaters never need to learn the verifier, and it is assumed that the equilibrium answer is correct.
+In our model, the verifier is unknown, each round reveals a single
+verdict on a new input, and we measure success by the number of
+mistakes with respect to the ground truth.
