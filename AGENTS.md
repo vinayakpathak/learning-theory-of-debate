@@ -396,6 +396,8 @@ or terminology for the debate model.
 
 ## LaTeX and document style
 
+- In the arXiv author block, place corresponding-author contact details in a
+  title-page footnote linked to the author's name.
 - Prefer the conference template's theorem, lemma, proof, and algorithm
   environments, with small style adjustments when needed instead of separate
   conversion-only environments. Use proof environments for full proofs and
