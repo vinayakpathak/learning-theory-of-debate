@@ -50,7 +50,8 @@
   {\small Canada CIFAR AI Chair, Vector Institute}
   \and
   Ruth Urner\\
-  {\small York University}
+  {\small York University, EECS Department}\\
+  {\small Vector Instutute}
 }
 \date{}
 \pagestyle{plain}
@@ -78,7 +79,7 @@ A \emph{debate of length} $n$ is a sequence $(\c_1, \c_2, \ldots, \c_{2n})$ of $
 The debate is moderated through a verifier, which takes in a domain point and a debate of length $n$ and produces a label for $x$ given the arguments in the debate. 
 The following definition specifies the relationship between hypotheses and verifiers in our framework.
 
-\begin{definition}
+\begin{definition}\label{def:verifier_validates_hypothesis}
 Let $h:\X\to\Y$ be a hypothesis. We say that verifier $v: \X\times \C^{2n} \to \Y$ \emph{validates} hypothesis $h$ through debate of length $n$ if for all $x\in\X$ there exists a unique $y\in \Y$ such that
 \begin{align*}
 \exists\ct^1\in\C\,\forall\cf^1\in\C\,\exists\ct^2\in\C\,\forall \cf^2\in\C\ldots\,\exists\ct^n\in\C\,\forall\cf^n\in\C,
@@ -125,10 +126,10 @@ $\Mi(T) = \sum_{t = 1}^T \indct[\hy_t \neq \ty_t].$
 
 A standard approach for using debate as a learning strategy considers the two debaters as playing the zero-sum game of winning the argument~\citep{irving2018debate,chen2023playing,browncohen2024debate,browncohen2025prover}.
 Standard formalizations \citep{irving2018debate,browncohen2024debate} define a loss for each debater.\footnote{Some works let the verifier output a score rather than a binary verdict, measuring how strongly the debate transcript supports the proposed label~\citep{chen2023playing,arnesen2024training,browncohen2025prover}; we use binary verdicts throughout.} Debater \dt aims to defend its hypothesized label $\hy_t$ and is therefore evaluated through the following loss: $\tLo(T) = \sum_{t = 1}^T \indct[\vy_t \neq \hy_t].$ 
-Debater \df, on the other hand, is evaluated against its aim to falsify the hypothesis that the first debater proposed, by setting its certificates in such a way that the verifier will conclude with a label $y_t$ that is not the hypothesized label $\hy_t$. 
+Debater \df, on the other hand, is evaluated against its aim to falsify the hypothesis that the first debater proposed, by setting its certificates in such a way that the verifier will conclude with a label $\vy_t$ that is not the hypothesized label $\hy_t$. 
 Therefore, \df is evaluated through the opposite loss: 
  $\fLo(T) = \sum_{t = 1}^T \indct[\vy_t = \hy_t] = T - \tLo(T).$
-If the learning problem is ignored, so that $v^*$ is known to both debaters, then a \dt optimizing $\tLo(T)$ with respect to a \df that optimizes $\fLo(T)$ leads to \dt always proposing the true label of $h^*$ verified by $v^*$, with certificates that cannot be refuted. Moreover, this leads to $\Mi(T) = \tLo(T)$, motivating this optimization objective. We discuss below the setting of two debaters that optimize their objectives separately, which we term the \emph{oppositional setting}. 
+If the learning problem is ignored, so that $v^*$ is known to both debaters, then a \dt optimizing $\tLo(T)$ with respect to a \df that optimizes $\fLo(T)$ leads to \dt always proposing the true label of $h^*$ verified by $v^*$, with proposer certificates that cannot be refuted. Moreover, this leads to $\Mi(T) = \tLo(T) = 0$, motivating this optimization objective. We discuss below the setting of two debaters that optimize their objectives separately, which we term the \emph{oppositional setting}. 
 
 We can also consider \dt and \df that can be cooperative, with the joint goal to minimize $\Mi(T)$. 
 In this case, \df provides its certificates in good faith ``for the sake of the argument'' so as to lead the verifier to the correct conclusions, having taken into account relevant potential counter-arguments. In this case, the two debaters can optimize their behavior together and can be thought of as a single entity that we also sometimes refer to as \emph{the learner} in this case. We study this learning setting below.
@@ -191,14 +192,14 @@ To analyze learnability, we will define \emph{version spaces} of verifiers that 
 \[
  \V_p = \{ v\in\V ~\mid~ v \text{ is consistent with all edges in }p\}.
 \]
-Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$. Note also that more than one verifier may induce the same hypothesis.
+Recall that each verifier $v$ induces one hypothesis $h$. Therefore, a verifier version space $\V_p$ induces a corresponding hypothesis version space $\H_p$. Recall also that more than one verifier may induce the same hypothesis.
 
 For a descendant node $\beta$ of a node $\alpha$ in $\T$, we let $p^\alpha_\beta$ denote the directed path from $\alpha$ to $\beta$.  In case $\alpha =\rho$ is the root node, we may simply use the notation $p_\beta = p^\rho_\beta$ to denote the path from root to node $\beta$. We will let $P^\alpha$ denote the set of all root-to-leaf paths in $\T$ that start at $\alpha$.
 
 For version spaces, we may use the shorthand notations $\V^\alpha_\beta = \V_{p^\alpha_\beta}$ and $\V_\beta = \V_{p_\beta}$. That is $\V_\beta$ is the verifier version space at a node $\beta$ in the tree: $\V_\beta$ contains exactly those verifiers that are consistent with the debate protocol as run from the beginning $\rho$ to node $\beta$ in the tree. Analogously, we use $\H^\alpha_\beta$ and $\H_\beta$ for the corresponding induced hypothesis version spaces.
 
 For any hypothesis $h:\X\to\Y$, we let $\mi(h, p )$ denote the number of disagreements between $h$ and the hypothesized labels on the edges of path $p$. That is $\mi(h, p) = \sum_{(\alpha, \beta)\in p}\indct[h(x_\alpha)\neq \hy^\alpha_\beta]$.
-Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incurred assuming that candidate verifier $v$ is the true $v^*$.
+Note that if a verifier $v$ is consistent with path $p$ and $h_v$ is the hypothesis corresponding to $v$, then  $\mi(h_v, p)$ corresponds to the number of mistakes the debaters incur in case candidate verifier $v$ is the true $v^*$.
 
 
 For a tree $\T$ and node $\alpha$ in $\T$, we let $\T^\alpha$ denote the subtree rooted at $\alpha$ in $\T$. Recall that $P^\alpha$ is the set of all root-to-leaf paths in $\T$ that are starting at $\alpha$.
@@ -258,7 +259,7 @@ Thus, the learner chooses a pair $(\hy, \sc)$ in $\argmin_{\hy, \sc}Q_t(\hy, \sc
 \[
 Q_t(\hy, \sc) = \max_{\vy\in\{0,1\}} ~\sup_{\T\in\Delta_n(\V_{(p_t,\hy, \sc, \vy)})} ~\min_{q\in\T^\rho} ~\max_{h\in \H_{(p_t,\hy, \sc, \vy)}\cap \H_q} (\mi(h, p_t) + \mi(h,q) +\indct[h(x_t) \neq \hy]),
 \]
-where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and environment response $\vy$. 
+where we use the notation $(p_t,\hy, \sc, \vy)$ for the path $p_t$ expanded with learner actions $(\hy, \sc)$ and verifier response $\vy$. 
 Note that for the version spaces defined through this expanded path, the domain point component $x_{t+1}$ of the  environment response is not relevant, and we thus omit it here to not overload the notation.
 
 \begin{lemma}\label{lemma:cooperative_deterministic_upperbound}
@@ -273,11 +274,11 @@ Note that for the version spaces defined through this expanded path, the domain 
 \section{Oppositional Debaters}
 \label{sec:oppositional}
 
-We now turn to consider the oppositional setting. As described in Section~\ref{sec:formal}, the standard approach (that does not involve learning) considers debaters that optimize the worst case $\tLo$ and $\fLo$ with respect to a worst-case opposing debater. However, we show here that in a learning setting, an approach minimizing a notion of \emph{regret} is more suitable. 
+We now turn to consider the oppositional setting. As described in Section~\ref{sec:formal}, the standard approach from the literature (that does not involve learning) considers debaters that optimize the worst case $\tLo$ and $\fLo$ with respect to a worst-case opposing debater. However, we show here that in a learning setting, an approach minimizing a notion of \emph{regret} is more suitable. 
 
 \subsection{Using regret to upper bound prediction mistakes}
 
-Given $v^*$, there is a strategy for \dt that obtains $\tLo(T) = 0$, since for any $x_t$, it can choose $\ct^1,\ldots,\ct^n$ that satisfy the validation requirement of $v^*$ for any $\cf^1,\ldots,\cf^n$. We call a round in which \dt selected $\hy_t  = h_{v^*}(x_t)$ and such certificates an \emph{irrefutable round}. For \df, even given $v^*$, it cannot avoid incurring a loss in irrefutable rounds. Therefore, for \df a notion of regret instead of loss is relevant even in a realizable setting: Let $U(T)$ be the number of irrefutable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. For \dt in the realizable setting, its regret is equal to its loss: 
+Given $v^*$, there is a strategy for \dt that obtains $\tLo(T) = 0$, since for any $x_t$, it can choose $\ct^1,\ldots,\ct^n$ that satisfy the validation requirement of $v^*$ for any $\cf^1,\ldots,\cf^n$ (as in Definition \ref{def:verifier_validates_hypothesis}). We call a round in which \dt selected $\hy_t  = h_{v^*}(x_t)$ and such certificates an \emph{irrefutable round}. For \df, even given $v^*$, it cannot avoid incurring a loss in irrefutable rounds. Therefore, for \df a notion of regret instead of loss is relevant even in a realizable setting: Let $U(T)$ be the number of irrefutable rounds in a given interaction. The smallest possible loss for \df is therefore $U(T)$. Thus, its regret is defined as $\fRe(T) = \fLo(T) - U(T)$. For \dt in the realizable setting, its regret is equal to its loss: 
 $\tRe(T) = \tLo(T)$. 
 
 
@@ -459,7 +460,8 @@ Moreover, our results demonstrate the brittleness of learning through debate to 
 
 For this work, we used ChatGPT and Claude for brainstorming some proof ideas and some examples. All derivations and proofs in the paper were written and verified by the authors.
 
-
+\section*{Acknowledgements}
+Ruth Urner's research is supported through an NSERC discovery grant.
 
 
 \bibliography{references}
