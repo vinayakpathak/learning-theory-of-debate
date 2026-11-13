@@ -212,7 +212,7 @@ The depth of the whole tree $\T$ is simply its depth at root node $\rho$, that i
 \]
 
 With this, we are ready to define the \emph{\debatedimname} for debate length $n$ of a verifier class:
-\begin{definition}[\debatedimname]
+\begin{definition}[Debate Learning Dimension]%[\debatedimname]
  Let $\V$ be a verifier class for domain $\X$. Let $\Y$ be a label space, $\C$ be a certificate space, and $n\in\naturals$ be a debate length. The \emph{length-$n$-\debatedimname} $\dldim(\V, n)$ of $\V$ is the largest possible depth of a debate tree for debate length $n$:
  \[
   \dldim(\V, n) = \sup_{\T\in\Delta_n(\V)} \depth(\T,\V).
@@ -457,7 +457,7 @@ Moreover, our results demonstrate the brittleness of learning through debate to 
 For this work, we used ChatGPT and Claude for brainstorming some proof ideas and some examples. All derivations and proofs in the paper were written and verified by the authors.
 
 \section*{Acknowledgements}
-Ruth Urner's research is supported through an NSERC discovery grant.
+We acknowledge the support of the Natural Sciences and Engineering Research Council of Canada (NSERC), [funding reference numbers RGPIN-2025-06329 and RGPIN-2024-05907]. Resources used in preparing this research were provided, in part, by the Province of Ontario, the Government of Canada through CIFAR, and companies sponsoring the Vector Institute; see \url{https://vectorinstitute.ai/partnerships/current-partners/}. This work was supported in part by a grant of access to OpenAI models through the ChatGPT for Academic Researchers program. Vinayak Pathak is supported by Advanced Research+Invention Agency (ARIA) of the United Kingdom and Coefficient Giving in San Francisco, California. Tosca Lechner was supported by a Vector Postdoctoral Fellowship.
 
 
 \bibliography{references}
