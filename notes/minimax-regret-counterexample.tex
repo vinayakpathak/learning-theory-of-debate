@@ -1,0 +1,156 @@
+% Standalone note. From the repository root, compile with:
+% latexmk -pdf -outdir=.vscode/latex-build/notes notes/minimax-regret-counterexample.tex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem{theorem}{Theorem}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\E}{\mathbb E}
+\newcommand{\V}{\mathcal V}
+\newcommand{\C}{\mathcal C}
+\newcommand{\X}{\mathcal X}
+\newcommand{\Lo}{\mathcal L}
+\newcommand{\Reg}{\mathcal R}
+\newcommand{\Mi}{\mathcal M}
+
+\title{Worst-case regret optimality does not guarantee accurate predictions}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+We give a fixed verifier class with two certificates and two hypotheses.
+There is a pair of debaters that each exactly minimizes its own worst-case
+expected regret for every horizon, but makes $T/2$ expected prediction
+mistakes. Cooperative learners make at most one mistake.
+The example uses the freedom to choose among minimax-optimal strategies.
+Its proposer deliberately makes unnecessary errors on easy inputs.
+Thus the claim is that minimax optimality alone does not guarantee accurate
+predictions, not that every minimax-optimal pair must fail.
+
+\section{The verifier class}
+
+Let $\X=\{e\}\cup\mathbb N$, where $e\notin\mathbb N$, and let
+$\C=\{0,1\}$. Debates have length one. For $b\in\{0,1\}$, define
+\[
+h_b(x)=
+\begin{cases}
+b,&x=e,\\
+0,&x\in\mathbb N.
+\end{cases}
+\]
+For each $b\in\{0,1\}$ and $s:\mathbb N\to\{0,1\}$, define
+\[
+v_{b,s}(x,p,r)=
+\begin{cases}
+b,&x=e,\\
+0,&x\in\mathbb N\text{ and }(p=s(x)\text{ or }r=0),\\
+1,&\text{otherwise}.
+\end{cases}
+\]
+Set $\V=\{v_{b,s}:b\in\{0,1\},\ s:\mathbb N\to\{0,1\}\}$.
+At a natural-number input, the verifier has the table
+\[
+\begin{array}{c|cc}
+ &r=0&r=1\\\hline
+p=s(x)&0&0\\
+p\ne s(x)&0&1
+\end{array}
+\]
+The certificate $p=s(x)$ forces label $0$, and $r=0$ prevents any
+certificate from forcing label $1$. At $e$, every entry is $b$.
+Consequently $v_{b,s}$ validates exactly $h_b$.
+
+\section{The objective and the separation}
+
+Write $\hat y_t$ for the proposed label and $\tilde y_t$ for the verifier
+feedback. As in the manuscript, define
+\[
+\Lo_P(T)=\sum_{t=1}^T\ind[\tilde y_t\ne\hat y_t],
+\qquad
+\Lo_R(T)=\sum_{t=1}^T\ind[\tilde y_t=\hat y_t].
+\]
+A round is irrefutable when $v_{b,s}(x_t,p_t,r)=\hat y_t$ for every
+$r\in\C$. Let $U(T)$ count these rounds, and set
+$\Reg_P(T)=\Lo_P(T)$ and $\Reg_R(T)=\Lo_R(T)-U(T)$.
+Prediction mistakes are
+$\Mi(T)=\sum_{t=1}^T\ind[\hat y_t\ne h_b(x_t)]$.
+
+Each debater minimizes the supremum of its expected regret over fixed
+verifiers in $\V$, adaptive input sequences, and strategies of the other
+debater. Expectations are over private randomization. The environment
+chooses $x_t$ before the proposer's current action, and the responder sees
+that action before responding. In particular, this is the manuscript's
+separate worst-case objective, rather than a common-prior objective or a
+best response to one fixed opponent.
+
+\begin{theorem}
+For this fixed verifier class, there are proposer and responder strategies
+that exactly minimize their respective worst-case expected regrets for
+every horizon $T$. Their worst-case expected regrets are $T/2$ and $0$,
+respectively. On the input sequence $x_t=e$ for all $t$, the pair makes
+$T/2$ expected prediction mistakes. There is a cooperative learner with
+at most one prediction mistake on every input sequence.
+\end{theorem}
+\begin{proof}
+We first give a responder that refutes every refutable prediction. It
+always chooses $r_t=1-\hat y_t$. At a natural-number input, a prediction
+of $1$ is refuted by $r_t=0$. A prediction of $0$ is refuted by $r_t=1$
+unless $p_t=s(x_t)$, in which case the round is irrefutable. At $e$, an
+incorrect prediction is automatically refuted and a correct prediction is
+irrefutable. Thus $\Reg_R(T)=0$ on every run, against every proposer.
+Since responder regret is nonnegative, this responder is minimax-optimal.
+
+The proposer uses fresh independent fair coins. On a natural-number
+input, it predicts $0$ and chooses $p_t$ uniformly from $\{0,1\}$.
+On input $e$, it predicts a uniformly random bit and chooses $p_t=0$.
+At a natural-number input, the event $p_t=s(x_t)$ has probability $1/2$
+and guarantees zero proposer loss, regardless of the responder's action.
+At $e$, the feedback is always $b$, so the expected loss is $1/2$.
+Hence this proposer guarantees $\E\Reg_P(T)\le T/2$ against every
+verifier, adaptive environment, and responder.
+
+To prove that this guarantee is optimal, fix any proposer. Present the
+distinct inputs $x_t=t$, let the responder always choose $r_t=1$, and
+sample $s(1),\ldots,s(T)$ independently and uniformly before play.
+The value of $b$ can be fixed arbitrarily. Conditional on the history and
+the proposer's current label and certificate, the fresh value $s(t)$ is
+still a fair bit. Therefore the feedback
+$\tilde y_t=\ind[p_t\ne s(t)]$ is a fair bit, and the proposer's expected
+loss in each round is $1/2$. Its expected regret, averaged over these
+fixed verifiers, is $T/2$. Some fixed verifier therefore gives expected
+regret at least $T/2$. This proves the minimax lower bound.
+
+Now pair the two specified strategies and present $e$ in every round.
+The proposer predicts a fresh fair bit each time, so
+$\E\Mi(T)=T/2$ for either fixed value of $b$. Both strategies remain
+exactly minimax-optimal by the preceding arguments.
+
+Finally, a cooperative learner predicts $0$ on every natural-number
+input. On the first occurrence of $e$, it predicts arbitrarily and
+observes feedback $b$. It predicts $b$ on every later occurrence of $e$.
+Only the first occurrence of $e$ can be a prediction mistake.
+\end{proof}
+
+\section{What the example establishes}
+
+The proposer learns $b$ on the first occurrence of $e$ but continues to
+predict randomly there. Replacing that behavior with prediction $b$
+improves its performance on these inputs without improving its worst-case
+regret, because fresh natural-number inputs still force expected regret
+$T/2$. Both behaviors are therefore minimax-optimal.
+
+This is a separation between what cooperation can achieve and what
+separate minimax optimality alone guarantees. It does not establish
+failure for every choice among minimax-optimal strategies, for strategies
+required to remain optimal conditional on each history, or for mutual
+best responses on the realized input sequence. Nor are both debaters
+no-regret learners in the sense of having sublinear regret. The
+proposer's optimal worst-case regret is linear, consistently with the
+manuscript's inequality $\Mi(T)\le\Reg_P(T)+\Reg_R(T)$.
+
+\end{document}

@@ -1,0 +1,516 @@
+% Standalone note. From the repository root, compile with:
+% latexmk -pdf -outdir=.vscode/latex-build/notes notes/iid_cooperative_characterization.tex
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+
+\newcommand{\X}{\mathcal X}
+\newcommand{\C}{\mathcal C}
+\newcommand{\V}{\mathcal V}
+\newcommand{\Hclass}{\mathcal H}
+\newcommand{\A}{\mathcal A}
+\newcommand{\E}{\mathbb E}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Unif}{Unif}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\setlist[enumerate]{itemsep=3pt,topsep=5pt}
+\setlength{\parskip}{3pt}
+\allowdisplaybreaks[1]
+
+\title{A characterization of cooperative debate with iid instances}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+We want to characterize when a fixed verifier class permits learning from
+independent and identically distributed (iid) instances. The difficulty is
+that the true label is encoded by a whole verifier table, while each round
+reveals only one entry. The induced hypothesis class alone does not describe
+how much these observations tell us. We must also keep track of the
+constraints that the verifier class imposes between tables at different
+instances.
+
+We give a necessary-and-sufficient condition using finite restrictions of
+the verifier class. On a tuple of instances, reveal one random verifier entry
+at every position except a uniformly chosen held-out position. The condition
+is that the worst-case error in predicting the true label at that position
+tends to zero as the tuple grows. Each finite problem is a linear program.
+This is an adaptation of the transductive approach to learnability; see
+\citet{asilis2024transductive} for the standard supervised framework. We prove
+the adaptation to verifier feedback here.
+
+\section{The model and the learning objective}\label{sec:model}
+
+Let $\C$ be a finite certificate set with $|\C|=k\ge1$. We consider one pair
+of certificates per debate, so the query set is $\A=\C^2$ and its size is
+$K=k^2$. A verifier is a function $v:\X\times\A\to\{0,1\}$. It is valid
+if, for every $x$, there is a unique bit $b$ satisfying
+\[
+\exists p\in\C\ \forall r\in\C:\quad v(x,p,r)=b.
+\]
+Write $h_v(x)$ for this bit. Thus the table at $x$ has an all-$h_v(x)$ row
+and no all-$(1-h_v(x))$ row.
+
+Fix any nonempty class $\V$ of valid verifiers, and let
+$\Hclass=\{h_v:v\in\V\}$ be its induced hypothesis class. We impose no
+closure condition on $\V$ and do not assume that it contains all valid
+verifiers for the hypotheses in $\Hclass$.
+
+A verifier $v^*\in\V$ and a distribution $D$ on $\X$ are fixed before
+learning begins. At round $t$, the cooperative learner receives
+$X_t\sim D$, independently of the past. It predicts $\hat Y_t$, chooses
+$A_t\in\A$, and observes only $Z_t=v^*(X_t,A_t)$. Both the prediction and
+the query may depend on the history, $X_t$, and the learner's randomness.
+The true label $h_{v^*}(X_t)$ is not revealed. The learner cannot make extra
+queries at the current instance or at previously observed instances.
+Its number of prediction mistakes is
+\[
+M_T=\sum_{t=1}^T\ind\{\hat Y_t\ne h_{v^*}(X_t)\}.
+\]
+
+We call $\V$ \emph{uniformly iid learnable} if there is one learner and a
+bound $R(T)=o(T)$ such that $\E[M_T]\le R(T)$ for every $D$, every
+$v^*\in\V$, and every $T$. The bound may depend on $\V$ and $k$, but not
+on $D$ or $v^*$. This is stronger than requiring sublinear mistakes separately
+for each fixed pair $(D,v^*)$, with no common rate.
+
+We will also use passive training observations of the form
+\[
+(X,A,Z),\qquad X\sim D,\quad A\sim\Unif(\A),\quad Z=v^*(X,A),
+\]
+where $X$ and $A$ are independent. A passive learner receives $m$ iid
+observations and outputs a predictor for a fresh instance. Its predictions
+may be randomized, and its output need not belong to $\Hclass$. Define
+$r_m(\V)$ to be the infimum, over all such learners, of their worst-case
+expected prediction error, where the worst case ranges over $D$ and $v^*$.
+The expectation includes training data, the fresh instance, and learner
+randomness. We allow $m=0$ in this definition.
+
+Appendix~\ref{app:passive} proves that $r_m(\V)\to0$ is equivalent to
+uniform iid learnability in the original cooperative protocol. The reduction
+uses that $K$ is finite and that predictions and queries can be chosen
+separately. It makes no computational efficiency claim.
+
+\section{A finite prediction problem}\label{sec:finite}
+
+The finite problem retains every relation between verifier tables that is
+visible on a given tuple. Fix $S=(x_1,\ldots,x_n)\in\X^n$, allowing
+repetitions, and define
+\[
+W_S=\left\{
+  \bigl(v(x_i,a)\bigr)_{i\in[n],\,a\in\A}:v\in\V
+\right\}.
+\]
+The elements of $W_S$ are $n\times K$ binary arrays. The entries in row $i$
+form the complete verifier table at $x_i$. Let $b_i(w)$ be the unique label
+validated by that table. If two verifiers induce the same array, their
+validated labels agree at every position, so $b_i(w)$ is well defined.
+
+Consider the following game.
+\begin{enumerate}
+\item The learner knows $S$ and $W_S$. An adversary chooses $w\in W_S$,
+before the random choices below, without revealing it.
+\item Choose $I\sim\Unif([n])$ and reveal $I$.
+\item For each $j\ne I$, independently choose $A_j\sim\Unif(\A)$ and
+reveal $(A_j,w_{j,A_j})$.
+\item The learner predicts $b_I(w)$.
+\end{enumerate}
+Every occurrence of an instance has its own independent query. In
+particular, equal values $x_i=x_j$ at distinct indices do not share their
+query randomization.
+
+Let $\tau(S)$ be the minimax error probability in this game, allowing
+randomized predictions, and set
+\[
+\tau_n(\V)=\sup_{S\in\X^n}\tau(S).
+\]
+The game is finite, so its optimum is attained and can be expressed as a
+linear program. Its value depends only on $W_S$, including the labels
+determined by its rows. Always $0\le\tau(S)\le1/2$, since a fair random
+prediction has error $1/2$.
+
+For measurability, assume that every verifier is measurable and, for every
+$n$ and every binary array $w$, the set
+$\{S\in\X^n:w\in W_S\}$ is measurable. These conditions are automatic
+on a countable domain with the discrete sigma algebra. They ensure that
+choosing a fixed optimal strategy for each finite pattern family gives a
+measurable prediction rule. We work under these conditions throughout.
+
+\section{The characterization}\label{sec:characterization}
+
+The learner for the positive direction is simple to describe. Given passive
+training observations and a test instance, append the test instance to the
+training tuple, randomly permute all positions, and use the optimal rule for
+the finite problem in Section~\ref{sec:finite}. The test position has no
+revealed verifier entry. The other positions retain their observed query
+and response.
+
+\begin{theorem}\label{thm:characterization}
+The verifier class $\V$ is uniformly iid learnable if and only if
+$\tau_n(\V)\to0$ as $n\to\infty$.
+\end{theorem}
+
+We prove the theorem by comparing the finite problem with passive learning.
+The first direction uses the learner just described.
+
+\begin{lemma}\label{lem:batch-from-finite}
+For every $n\ge1$, $r_{n-1}(\V)\le\tau_n(\V)$.
+\end{lemma}
+\begin{proof}
+Fix $D$ and $v^*$. Take $n-1$ iid passive training observations and an
+independent test instance. Append the test instance and randomly permute
+all $n$ positions. Let $S$ be the resulting ordered tuple, and let $I$ be
+the position occupied by the test instance.
+
+By exchangeability, $I$ is uniform on $[n]$ and independent of $S$. The
+queries at the other indices are independent and uniform in $\A$,
+independently of $S$ and $I$. For each fixed $S$, the true verifier induces
+an array $w\in W_S$. Conditional on $S$, the learner therefore faces
+exactly the finite prediction problem, with this array as the adversary's
+choice. Its conditional error is at most $\tau(S)$, and hence its
+unconditional error is at most $\tau_n(\V)$.
+
+The procedure defines a prediction rule for every test instance using the
+same training data. Since the bound holds for every $D$ and $v^*$, the
+claimed inequality follows.
+\end{proof}
+
+For the reverse direction, we use an iid learner on the uniform distribution
+over the tuple. The finite game supplies only one query at each available
+index. We can still simulate an iid sample unless we draw an index twice or
+draw the held-out index.
+
+\begin{lemma}\label{lem:finite-from-batch}
+For every $n\ge1$ and $m\ge1$,
+\[
+\tau_n(\V)\le r_m(\V)+\frac{m(m+1)}{2n}.
+\]
+\end{lemma}
+\begin{proof}
+Fix a passive learner whose worst-case expected error after $m$ observations
+is at most $r$, and fix a tuple $S=(x_1,\ldots,x_n)$. Let $D_S$ be the
+distribution obtained by choosing an index uniformly from $[n]$ and
+returning the instance at that index. Repeated values in $S$ contribute
+their multiplicities to $D_S$.
+
+In the finite game, draw indices $J_1,\ldots,J_m$ independently and
+uniformly from $[n]$, independently of $I$ and all revealed queries. If
+these indices are distinct and none equals $I$, feed their revealed
+observations to the passive learner and use its prediction at $x_I$.
+Otherwise, make an arbitrary prediction.
+
+To bound the error, couple this procedure to an ideal experiment in which
+the passive learner receives $m$ iid observations from $D_S$ and is tested
+at an independent instance from $D_S$. Use $J_1,\ldots,J_m$ for its
+training indices and $I$ for its test index. On the event that the training
+indices are distinct and avoid $I$, their available queries are independent
+and uniform, so they can be used as the ideal experiment's queries. On the
+complementary event, generate fresh independent queries for the ideal
+experiment. Conditional on every index sequence, the ideal queries have
+the required law. Thus the two procedures agree whenever the simulation
+succeeds.
+
+By the union bound, its failure probability is at most
+\[
+\Pr\bigl(\exists\ell:J_\ell=I
+  \text{ or }\exists\ell<q:J_\ell=J_q\bigr)
+\le\frac mn+\frac{\binom m2}{n}
+=\frac{m(m+1)}{2n}.
+\]
+For each $w\in W_S$, choose a verifier realizing $w$. The ideal experiment
+has expected error at most $r$ for that verifier, so the finite-game rule
+has error at most $r+m(m+1)/(2n)$ for every $w$. Taking the supremum over
+$S$ and then the infimum over passive learners proves the claim. An optimal
+passive learner need not exist for this argument.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:characterization}]
+If $\tau_n(\V)\to0$, Lemma~\ref{lem:batch-from-finite} gives
+$r_m(\V)\to0$. Conversely, if $r_m(\V)\to0$, first choose $m$ to make
+$r_m(\V)$ small, then let $n$ grow in Lemma~\ref{lem:finite-from-batch}.
+This gives $\tau_n(\V)\to0$. Lemma~\ref{lem:passive-equivalence} in
+Appendix~\ref{app:passive} identifies $r_m(\V)\to0$ with uniform iid
+learnability in the cooperative protocol.
+\end{proof}
+
+The positive direction gives an explicit online guarantee. At round $t$,
+use the finite-game rule on the previous $t-1$ passive observations and
+the current instance, and then query the current verifier table uniformly.
+The past observations remain iid regardless of the predictions. Therefore
+\[
+\E[M_T]\le\sum_{t=1}^T\tau_t(\V).
+\]
+If $\tau_t(\V)\to0$, the right-hand side is $o(T)$.
+
+Randomization of the prediction is not needed for the vanishing-error
+criterion. Let $p(s,x)$ be a rule's probability of predicting $1$, given
+training data $s$ and test instance $x$, including all its internal
+randomization. Replace the rule by $g_s(x)=\ind\{p(s,x)\ge1/2\}$. For
+either true bit $b$,
+\[
+\ind\{g_s(x)\ne b\}
+\le 2\bigl(p(s,x)\ind\{b=0\}
+ +(1-p(s,x))\ind\{b=1\}\bigr).
+\]
+Thus a deterministic output function costs at most a factor of two in the
+expected error. It may be outside $\Hclass$. This rounding leaves the
+uniform query choices unchanged.
+
+\section{Computing the finite parameter}\label{sec:parameter}
+
+The finite-game definition can be written without quantifying over a
+learner. Choose a prior $\pi$ on $W_S$. For each possible observation
+$o=(i,a,z)$, the index $i$ is held out, while
+$a\in\A^{[n]\setminus\{i\}}$ and
+$z\in\{0,1\}^{[n]\setminus\{i\}}$ list the revealed queries and
+responses. For $b\in\{0,1\}$, define the prior mass consistent with this
+observation and target bit by
+\[
+q_b^\pi(i,a,z)=
+\sum_{\substack{w\in W_S:\ b_i(w)=b,\\
+                   w_{j,a_j}=z_j\ \text{for all }j\ne i}}\pi(w).
+\]
+
+\begin{proposition}\label{prop:dual}
+For every finite tuple $S$ of length $n$,
+\begin{equation}\label{eq:dual}
+\tau(S)=\max_{\pi\in\Delta(W_S)}
+\frac{1}{nK^{n-1}}
+\sum_{i=1}^n\ \sum_{a\in\A^{[n]\setminus\{i\}}}
+\ \sum_{z\in\{0,1\}^{[n]\setminus\{i\}}}
+\min\{q_0^\pi(i,a,z),q_1^\pi(i,a,z)\}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Fix a prior $\pi$. The probability of observing $(i,a,z)$ is
+$(q_0^\pi(i,a,z)+q_1^\pi(i,a,z))/(nK^{n-1})$. When this probability is
+positive, the two posterior target probabilities are the corresponding
+$q_b^\pi(i,a,z)$ divided by their sum. The optimal prediction under this
+prior chooses a bit of larger posterior probability. Its contribution to
+the total error is therefore
+$\min\{q_0^\pi(i,a,z),q_1^\pi(i,a,z)\}/(nK^{n-1})$.
+Zero-probability observations contribute zero.
+
+Summing gives the optimal expected error against $\pi$. The finite minimax
+theorem allows us to maximize this value over priors to obtain the
+smallest worst-case error, proving~\eqref{eq:dual}.
+\end{proof}
+
+For a literal linear program, introduce a variable $u_{i,a,z}$ for each
+observation. Maximize $(nK^{n-1})^{-1}\sum_{i,a,z}u_{i,a,z}$ over
+$\pi\in\Delta(W_S)$ and $u_{i,a,z}\ge0$, subject to
+$u_{i,a,z}\le q_0^\pi(i,a,z)$ and
+$u_{i,a,z}\le q_1^\pi(i,a,z)$. All these constraints are linear.
+The prior is used to describe the value; an optimal finite-game strategy
+works for every array and does not need to know a prior.
+
+Equivalently, $\tau(S)$ is the largest possible expected posterior
+uncertainty about the held-out label. The characterization requires this
+uncertainty to vanish uniformly over finite tuples. The program is finite
+once $W_S$ is given, but finding $W_S$ from a representation of $\V$ may
+be difficult. The result concerns statistical learnability, not efficient
+computation.
+
+One can also define an accuracy-dependent parameter
+\[
+d_\varepsilon(\V)=
+\sup\{n\ge1:\text{there is }S\in\X^n
+                       \text{ with }\tau(S)>\varepsilon\},
+\]
+with the supremum of the empty set taken to be zero. The theorem says that
+learning is possible exactly when $d_\varepsilon(\V)<\infty$ for every
+$\varepsilon>0$. We do not claim that one fixed value of $\varepsilon$
+suffices, or that this parameter has a simpler shattering characterization.
+
+\section{Examples}\label{sec:examples}
+
+\subsection{Direct labels}
+
+Suppose $\V=\{v_h:h\in\Hclass\}$, where $v_h(x,a)=h(x)$ for every
+query $a$. The observations at the revealed indices are then ordinary
+labels. Our finite game becomes the usual transductive problem of
+predicting one held-out label, and learnability is equivalent to finite
+VC dimension. This connects the criterion to the classical transductive
+approach of \citet{haussler1994predicting}.
+
+\subsection{Independent hidden tables}
+
+We recall a class with two constant hypotheses for which the finite
+parameter never decreases. Let $\X=\mathbb N$, $\C=\mathbb Z_4$, and
+\[
+B=\begin{pmatrix}
+0&0&0&0\\
+0&0&1&1\\
+0&1&1&1\\
+0&1&1&1
+\end{pmatrix}.
+\]
+The table has eight zeros and eight ones. Its all-zero first row and first
+column ensure that it validates $0$; its complement validates $1$.
+For $b\in\{0,1\}$ and maps $\alpha,\beta:\mathbb N\to\mathbb Z_4$,
+define
+\[
+v_{b,\alpha,\beta}(x,p,r)
+=b\oplus B_{p+\alpha(x),\,r+\beta(x)},
+\qquad
+\V_{\mathrm{ind}}=
+\{v_{b,\alpha,\beta}:b\in\{0,1\},\
+  \alpha,\beta:\mathbb N\to\mathbb Z_4\},
+\]
+where indices are modulo $4$ and $\oplus$ is addition modulo $2$. Row and column shifts
+preserve validity, so the induced hypotheses are exactly $h_b(x)=b$.
+
+Fix a tuple of distinct instances. Choose $b$ fairly, and independently
+choose both shifts uniformly at each instance in the tuple. This defines
+a prior on $W_S$. Conditional on either value of $b$, every revealed entry
+is a fair bit, even when its query is known. The entries observed at
+different instances are independent. The full observation therefore gives
+no information about $b$, and the held-out target has posterior
+probabilities $1/2,1/2$. Proposition~\ref{prop:dual} gives $\tau(S)=1/2$.
+There are arbitrarily large distinct tuples, so
+$\tau_n(\V_{\mathrm{ind}})=1/2$ for every $n$, although the induced
+hypothesis class has VC dimension $1$.
+
+For any $k>4$, the same construction works by fixing a surjection
+$\phi:\C\to\mathbb Z_4$ and replacing $p,r$ in the displayed formula by
+$\phi(p),\phi(r)$. The extra certificates duplicate rows and columns and
+do not reveal additional information.
+
+\subsection{One table shared across instances}
+
+Keep the same base table $B$, but require the shifts to be constant across
+instances. Define
+\[
+\V_{\mathrm{shared}}=
+\{v_{b,u,w}(x,p,r)=b\oplus B_{p+u,\,r+w}:
+     b\in\{0,1\},\ u,w\in\mathbb Z_4\}.
+\]
+This class has the same two induced hypotheses as
+$\V_{\mathrm{ind}}$, and at each individual instance it permits exactly
+the same tables. The difference is that all instances use the same table.
+
+The $n-1$ revealed queries in the finite game now sample entries of that
+single table. Once every entry has appeared, its validated label is known.
+Predict that label when the table is complete, and otherwise predict a fair
+bit. By the union bound, for every tuple $S$,
+\[
+\tau(S)\le
+\frac{K}{2}\left(1-\frac1K\right)^{n-1},
+\qquad K=16.
+\]
+Thus $\tau_n(\V_{\mathrm{shared}})\to0$. The finite pattern families
+distinguish these two classes because they retain the relation between
+tables at different instances. Neither the induced hypothesis class nor
+the set of possible tables at each individual instance makes this
+distinction.
+
+\appendix
+\section{Passive observations and cooperative learning}\label{app:passive}
+
+We show that uniform random queries preserve learnability. The conversion
+from online mistakes to the error of a saved predictor is the standard
+online-to-batch argument; see \citet{cesabianchi2004generalization}. Here we
+also need to simulate the learner's chosen queries from passive data.
+
+\begin{lemma}\label{lem:passive-equivalence}
+The verifier class $\V$ is uniformly iid learnable if and only if
+$r_m(\V)\to0$.
+\end{lemma}
+\begin{proof}
+Suppose first that $r_m(\V)\to0$. For each $m\ge1$, choose a passive
+learner with worst-case expected error at most $r_m(\V)+1/m$; the
+infimum defining $r_m$ need not be attained. At round $t\ge2$, use the
+learner for $m=t-1$ on the past observations to predict the current label.
+Then query a fresh uniformly random element of $\A$. Since the query
+distribution is independent of the prediction and history, the past
+observations have exactly the passive iid law. Hence
+\[
+\E[M_T]\le1+\sum_{m=1}^{T-1}\bigl(r_m(\V)+1/m\bigr)=o(T).
+\]
+
+Conversely, suppose an online learner has expected mistake bound $R(T)$
+uniformly over $D$ and $v^*$. Fix a virtual horizon $T$. We first simulate
+$T$ rounds using an infinite stream of passive observations. At the start
+of each virtual round, draw and hold fixed the learner's random seed for
+that round. Its proposed prediction and query are then fixed functions of
+the candidate instance and the current virtual state. Given a candidate
+observation $(X,A,Z)$, expose only
+$X$ to the simulated learner and let it propose its prediction and query
+$A^*$. Its internal randomness is independent of the recorded $A$.
+Accept the round if $A=A^*$, in which case reveal $Z$ and update the
+virtual state. Otherwise discard the candidate and all tentative state
+changes, retaining the same seed for the next attempt.
+
+Conditional on the virtual state, the candidate instance, and the proposed
+prediction and query, acceptance has probability $1/K$. Thus acceptance
+does not bias the instance or the learner's proposed choices. The accepted
+rounds have exactly the original online learner's law on iid instances.
+If $L_T$ is the number of passive observations needed to accept $T$ rounds,
+each virtual round has expected waiting time $K$, so $\E[L_T]=KT$.
+
+Let $f_t$ be the saved prediction rule just before the instance of virtual
+round $t$ is presented, including that round's fixed seed. Define its population error
+by $L(f_t)=\Pr_{X\sim D}(f_t(X)\ne h_{v^*}(X))$. Independence of the
+next accepted instance from the virtual history gives
+\[
+\E[L(f_t)]
+=\E\bigl[\ind\{f_t(X_t)\ne h_{v^*}(X_t)\}\bigr].
+\]
+Consequently, choosing a uniform independent $J\in[T]$ after the ideal
+simulation gives $\E[L(f_J)]\le R(T)/T$. Evaluating a saved rule does not
+update its state or make a new verifier query.
+
+Now give the simulator only $N$ passive observations. If it finishes $T$
+virtual rounds, return the saved rule indexed by $J$; otherwise return an
+arbitrary predictor. Couple this learner to the infinite-stream simulation.
+On $\{L_T\le N\}$ their outputs agree. Since errors are at most one,
+Markov's inequality gives
+\[
+r_N(\V)
+\le\frac{R(T)}{T}+\Pr(L_T>N)
+\le\frac{R(T)}{T}+\frac{KT}{N}.
+\]
+Taking $T=\lfloor\sqrt{N/K}\rfloor$ for sufficiently large $N$ proves
+$r_N(\V)\to0$. This coupling avoids conditioning the ideal learner's
+error guarantee on the event that the simulation finishes within its
+budget.
+\end{proof}
+
+\begin{thebibliography}{3}
+
+\bibitem[Asilis et~al.(2024)Asilis, Devic, Dughmi, Sharan, and Teng]{asilis2024transductive}
+Julian Asilis, Siddartha Devic, Shaddin Dughmi, Vatsal Sharan, and
+Shang-Hua Teng.
+\newblock Transductive learning is compact.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+volume~37, 2024.
+\newblock \href{https://proceedings.neurips.cc/paper_files/paper/2024/file/eb7295a8bc613b375726659c2ecd6f14-Paper-Conference.pdf}{Conference paper}.
+
+\bibitem[Cesa-Bianchi et~al.(2004)Cesa-Bianchi, Conconi, and Gentile]{cesabianchi2004generalization}
+Nicol\`o Cesa-Bianchi, Alex Conconi, and Claudio Gentile.
+\newblock On the generalization ability of on-line learning algorithms.
+\newblock \emph{IEEE Transactions on Information Theory}, 50(9):2050--2057,
+2004.
+\newblock \href{https://cesa-bianchi.di.unimi.it/Pubblicazioni/J20.pdf}{Author's copy}.
+
+\bibitem[Haussler et~al.(1994)Haussler, Littlestone, and Warmuth]{haussler1994predicting}
+David Haussler, Nick Littlestone, and Manfred~K. Warmuth.
+\newblock Predicting $\{0,1\}$-functions on randomly drawn points.
+\newblock \emph{Information and Computation}, 115(2):248--292, 1994.
+\newblock \href{https://doi.org/10.1006/inco.1994.1097}{doi:10.1006/inco.1994.1097}.
+
+\end{thebibliography}
+\end{document}
